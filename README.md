@@ -1,5 +1,7 @@
 # 🪬 Agile Shaman
 
+> **🤖 100% AI-Generated Disclaimer:** This entire repository was created through pure AI collaboration. No human developers were harmed (or employed) in the making of this game. The code, design, gameplay mechanics, and even this README were crafted by AI. What happens when you give an AI too much coffee and a passion for satirizing software development! ☕✨
+
 *Master the Ancient Arts of Software Delivery*
 
 A satirical card-based game where you play as the "Agile Shaman," balancing the mystical energies of software development while navigating the chaos of modern tech teams.
