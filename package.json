@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://USERNAME.github.io/agile-shaman",
+  "homepage": "https://d8n1z.github.io/agileshaman",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
