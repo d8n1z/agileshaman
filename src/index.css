@@ -1,0 +1,111 @@
+/* Import developer-friendly fonts */
+@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Minimalistic gruvbox game styles */
+@layer base {
+  body {
+    @apply bg-gruvbox-dark-bg0 min-h-screen text-gruvbox-dark-fg font-mono;
+    font-family: 'Source Code Pro', monospace;
+  }
+  
+  .terminal-card {
+    @apply bg-gruvbox-dark-bg1 border border-gruvbox-dark-bg3 rounded;
+  }
+  
+  .button-primary {
+    @apply bg-gruvbox-light-blue text-gruvbox-dark-bg hover:bg-gruvbox-bright-blue;
+  }
+  
+  .button-secondary {
+    @apply bg-gruvbox-dark-bg2 text-gruvbox-dark-fg hover:bg-gruvbox-dark-bg3;
+  }
+  
+  .text-accent {
+    @apply text-gruvbox-bright-yellow;
+  }
+  
+  .text-danger {
+    @apply text-gruvbox-bright-red;
+  }
+  
+  .text-success {
+    @apply text-gruvbox-bright-green;
+  }
+
+  /* Real-time journal animations */
+  @keyframes fadeInSlide {
+    0% {
+      opacity: 0;
+      transform: translateX(-20px);
+      background-color: rgba(131, 165, 152, 0.3);
+    }
+    50% {
+      background-color: rgba(131, 165, 152, 0.2);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+      background-color: rgba(60, 56, 54, 0.5);
+    }
+  }
+  
+  .animate-fadeInSlide {
+    animation: fadeInSlide 1s ease-out;
+  }
+
+  /* Number change animations */
+  @keyframes numberPop {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.3);
+      color: #fabd2f;
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  
+  @keyframes numberDecrement {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.3);
+      color: #fb4934;
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  
+  .animate-numberPop {
+    animation: numberPop 0.4s ease-out;
+  }
+  
+  .animate-numberDecrement {
+    animation: numberDecrement 0.4s ease-out;
+  }
+}
+
+/* Terminal scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gruvbox-dark-bg2;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gruvbox-dark-bg4 rounded;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gruvbox-dark-fg4;
+}
