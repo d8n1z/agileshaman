@@ -368,71 +368,22 @@ export const useGameState = () => {
     };
   }, [gameState.actionsLeft, gameState.cardActionsCompleted, gameState.sprint]);
 
-  // Development shortcut: Ctrl+Shift+W to trigger victory
-  const triggerDevVictory = useCallback(() => {
-    // Try multiple ways to check for development mode
-    const isDev = import.meta.env.DEV ||
-                  import.meta.env.MODE === 'development' ||
-                  import.meta.env.NODE_ENV === 'development';
-
-    if (isDev) {
-      console.log('🎯 DEV SHORTCUT: Setting victory state...');
-      setGameState(prev => ({
-        ...prev,
-        gameStatus: 'victory'
-      }));
-      console.log('🎯 DEV SHORTCUT: Victory state set!');
-    } else {
-      console.log('🎯 DEV SHORTCUT: Not in dev mode, ignoring victory trigger');
-    }
-  }, []);
-
-  // Listen for development shortcuts
+  // Listen for restart shortcut (works in production)
   useEffect(() => {
-    console.log('🎯 DEV SHORTCUT: Checking dev mode...', {
-      DEV: import.meta.env.DEV,
-      MODE: import.meta.env.MODE,
-      NODE_ENV: import.meta.env.NODE_ENV,
-      VITE_MODE: import.meta.env.VITE_MODE
-    });
-
-    // Try multiple ways to check for development mode
-    const isDev = import.meta.env.DEV ||
-                  import.meta.env.MODE === 'development' ||
-                  import.meta.env.NODE_ENV === 'development';
-
-    console.log('🎯 DEV SHORTCUT: Is dev?', isDev);
-
-    if (!isDev) {
-      console.log('🎯 DEV SHORTCUT: Disabled (not in dev mode)');
-      return; // Only in development
-    }
-
-    console.log('🎯 DEV SHORTCUT: Enabled (Ctrl+Shift+W)');
-
     const handleKeyDown = (event: KeyboardEvent) => {
-      console.log('🎯 DEV SHORTCUT: Key pressed:', {
-        key: event.key,
-        ctrlKey: event.ctrlKey,
-        shiftKey: event.shiftKey,
-        altKey: event.altKey,
-        metaKey: event.metaKey
-      });
-
-      if (event.ctrlKey && event.shiftKey && event.key === 'W') {
+      if (event.ctrlKey && event.shiftKey && event.key === 'R') {
         event.preventDefault();
-        console.log('🎯 DEV SHORTCUT: Triggering victory...');
-        triggerDevVictory();
-        console.log('🎯 DEV SHORTCUT: Victory triggered (Ctrl+Shift+W)');
+        console.log('🔄 RESTART SHORTCUT: Ctrl+Shift+R pressed');
+        // Dispatch custom event for component to handle confirmation
+        window.dispatchEvent(new CustomEvent('restartGameRequest'));
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => {
-      console.log('🎯 DEV SHORTCUT: Cleaning up event listener');
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [triggerDevVictory]);
+  }, []);
 
   return {
     gameState,
@@ -442,7 +393,6 @@ export const useGameState = () => {
     nextSprint,
     restartGame,
     performRitual,
-    addLogEntry,
-    triggerDevVictory
+    addLogEntry
   };
 };

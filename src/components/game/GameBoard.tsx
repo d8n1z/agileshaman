@@ -17,8 +17,9 @@ interface GameBoardProps {
 }
 
 export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
-  const { gameState, numberAnimations, chaosEffect, makeChoice, nextSprint, restartGame, performRitual, triggerDevVictory } = useGameState();
+  const { gameState, numberAnimations, chaosEffect, makeChoice, nextSprint, restartGame, performRitual } = useGameState();
   const [showExitConfirm, setShowExitConfirm] = useState(false);
+  const [showRestartConfirm, setShowRestartConfirm] = useState(false);
   const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
   const [shuffledQuotes, setShuffledQuotes] = useState<typeof PROJECT_QUOTES>([]);
   const [isQuoteHovered, setIsQuoteHovered] = useState(false);
@@ -37,6 +38,16 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
 
     window.addEventListener('requestGameExit', handleExitRequest);
     return () => window.removeEventListener('requestGameExit', handleExitRequest);
+  }, []);
+
+  // Listen for restart shortcut requests
+  useEffect(() => {
+    const handleRestartRequest = () => {
+      setShowRestartConfirm(true);
+    };
+
+    window.addEventListener('restartGameRequest', handleRestartRequest);
+    return () => window.removeEventListener('restartGameRequest', handleRestartRequest);
   }, []);
 
   const handleBackToMenu = () => {
@@ -133,23 +144,18 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
               <span className="text-gruvbox-dark-fg4 text-xs font-mono opacity-60 hover:opacity-100 transition-opacity duration-200">
                 --quit
               </span>
+              <button
+                onClick={() => setShowRestartConfirm(true)}
+                className="text-gruvbox-bright-orange text-xs font-mono bg-gruvbox-dark-bg2 px-2 py-1 rounded ml-2 opacity-75 hover:opacity-100 hover:bg-gruvbox-dark-bg1 transition-all duration-200"
+                title="Restart game (Ctrl+Shift+R)"
+              >
+                🔄 RESTART
+              </button>
               {import.meta.env.DEV && (
-                <>
-                  <span className="text-gruvbox-bright-red text-xs font-mono bg-gruvbox-dark-bg2 px-2 py-1 rounded ml-2 opacity-75 hover:opacity-100 transition-opacity duration-200 animate-pulse"
-                        title="Ctrl+Shift+W = Win Screen">
-                    DEV: Ctrl+Shift+W
-                  </span>
-                  <button
-                    onClick={() => {
-                      console.log('🎯 DEV BUTTON: Triggering victory...');
-                      triggerDevVictory();
-                    }}
-                    className="text-gruvbox-bright-orange text-xs font-mono bg-gruvbox-dark-bg2 px-2 py-1 rounded ml-2 opacity-75 hover:opacity-100 hover:bg-gruvbox-dark-bg1 transition-all duration-200"
-                    title="Click to win (dev mode only)"
-                  >
-                    🎯 WIN
-                  </button>
-                </>
+                <span className="text-gruvbox-bright-red text-xs font-mono bg-gruvbox-dark-bg2 px-2 py-1 rounded ml-2 opacity-75 hover:opacity-100 transition-opacity duration-200 animate-pulse"
+                      title="Ctrl+Shift+R = Restart Game">
+                  DEV: Ctrl+Shift+R
+                </span>
               )}
             </div>
             
@@ -754,6 +760,40 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                 </button>
                 <button
                   onClick={() => setShowExitConfirm(false)}
+                  className="bg-gruvbox-dark-bg2 text-gruvbox-dark-fg hover:bg-gruvbox-dark-bg3 px-6 py-3 rounded-lg font-semibold transition-all duration-200"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Restart Confirmation Dialog */}
+      {showRestartConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+          <div className="terminal-card p-6 max-w-md mx-4">
+            <div className="text-center">
+              <div className="text-gruvbox-bright-orange text-xl font-bold mb-4">
+                🔄 Restart Game?
+              </div>
+              <div className="text-gruvbox-dark-fg2 mb-6">
+                This will reset your current progress and start a new game from the beginning. All your sprint data will be lost. Are you sure?
+              </div>
+              <div className="flex gap-3 justify-center">
+                <button
+                  onClick={() => {
+                    console.log('🔄 RESTART CONFIRMED: Restarting game...');
+                    restartGame();
+                    setShowRestartConfirm(false);
+                  }}
+                  className="bg-gruvbox-bright-orange hover:bg-gruvbox-bright-orange text-gruvbox-dark-bg px-6 py-3 rounded-lg font-semibold transition-all duration-200"
+                >
+                  Yes, Restart Game
+                </button>
+                <button
+                  onClick={() => setShowRestartConfirm(false)}
                   className="bg-gruvbox-dark-bg2 text-gruvbox-dark-fg hover:bg-gruvbox-dark-bg3 px-6 py-3 rounded-lg font-semibold transition-all duration-200"
                 >
                   Cancel
