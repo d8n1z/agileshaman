@@ -133,6 +133,12 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
               <span className="text-gruvbox-dark-fg4 text-xs font-mono opacity-60 hover:opacity-100 transition-opacity duration-200">
                 --quit
               </span>
+              {import.meta.env.DEV && (
+                <span className="text-gruvbox-bright-red text-xs font-mono bg-gruvbox-dark-bg2 px-2 py-1 rounded ml-2 opacity-75 hover:opacity-100 transition-opacity duration-200"
+                      title="Ctrl+Shift+W = Win Screen">
+                  DEV: Ctrl+Shift+W
+                </span>
+              )}
             </div>
             
             {/* Center Section - Metrics (Wider & More Readable) */}

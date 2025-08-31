@@ -368,6 +368,32 @@ export const useGameState = () => {
     };
   }, [gameState.actionsLeft, gameState.cardActionsCompleted, gameState.sprint]);
 
+  // Development shortcut: Ctrl+Shift+W to trigger victory
+  const triggerDevVictory = useCallback(() => {
+    if (import.meta.env.DEV) {
+      setGameState(prev => ({
+        ...prev,
+        gameStatus: 'victory'
+      }));
+    }
+  }, []);
+
+  // Listen for development shortcuts
+  useEffect(() => {
+    if (!import.meta.env.DEV) return; // Only in development
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.ctrlKey && event.shiftKey && event.key === 'W') {
+        event.preventDefault();
+        triggerDevVictory();
+        console.log('🎯 DEV SHORTCUT: Victory triggered (Ctrl+Shift+W)');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [triggerDevVictory]);
+
   return {
     gameState,
     numberAnimations,
@@ -376,6 +402,7 @@ export const useGameState = () => {
     nextSprint,
     restartGame,
     performRitual,
-    addLogEntry
+    addLogEntry,
+    triggerDevVictory
   };
 };
