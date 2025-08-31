@@ -17,7 +17,7 @@ interface GameBoardProps {
 }
 
 export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
-  const { gameState, numberAnimations, chaosEffect, makeChoice, nextSprint, restartGame, performRitual } = useGameState();
+  const { gameState, numberAnimations, chaosEffect, makeChoice, nextSprint, restartGame, performRitual, triggerDevVictory } = useGameState();
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
   const [shuffledQuotes, setShuffledQuotes] = useState<typeof PROJECT_QUOTES>([]);
@@ -134,10 +134,22 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                 --quit
               </span>
               {import.meta.env.DEV && (
-                <span className="text-gruvbox-bright-red text-xs font-mono bg-gruvbox-dark-bg2 px-2 py-1 rounded ml-2 opacity-75 hover:opacity-100 transition-opacity duration-200"
-                      title="Ctrl+Shift+W = Win Screen">
-                  DEV: Ctrl+Shift+W
-                </span>
+                <>
+                  <span className="text-gruvbox-bright-red text-xs font-mono bg-gruvbox-dark-bg2 px-2 py-1 rounded ml-2 opacity-75 hover:opacity-100 transition-opacity duration-200 animate-pulse"
+                        title="Ctrl+Shift+W = Win Screen">
+                    DEV: Ctrl+Shift+W
+                  </span>
+                  <button
+                    onClick={() => {
+                      console.log('🎯 DEV BUTTON: Triggering victory...');
+                      triggerDevVictory();
+                    }}
+                    className="text-gruvbox-bright-orange text-xs font-mono bg-gruvbox-dark-bg2 px-2 py-1 rounded ml-2 opacity-75 hover:opacity-100 hover:bg-gruvbox-dark-bg1 transition-all duration-200"
+                    title="Click to win (dev mode only)"
+                  >
+                    🎯 WIN
+                  </button>
+                </>
               )}
             </div>
             
