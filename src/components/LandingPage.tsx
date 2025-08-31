@@ -215,19 +215,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartGame, onBrowseC
               whileHover={{ scale: 1.05, rotateY: -5 }}
               whileTap={{ scale: 0.95 }}
               initial={{ opacity: 0, y: 50, rotateX: 15 }}
-              animate={{ 
-                opacity: 1, 
-                y: 0, 
+              animate={{
+                opacity: 1,
+                y: 0,
                 rotateX: 0,
-                rotateZ: [0, 1, -1, 0],
-                borderOpacity: [0.5, 0.8, 0.5]
+                rotateZ: [0, 1, -1, 0]
               }}
-              transition={{ 
+              transition={{
                 opacity: { delay: 0.3, duration: 0.6, type: "spring", stiffness: 100 },
                 y: { delay: 0.3, duration: 0.6, type: "spring", stiffness: 100 },
                 rotateX: { delay: 0.3, duration: 0.6, type: "spring", stiffness: 100 },
-                rotateZ: { delay: 1.5, duration: 3, repeat: Infinity, ease: "easeInOut" },
-                borderOpacity: { delay: 1.5, duration: 3, repeat: Infinity, ease: "easeInOut" }
+                rotateZ: { delay: 1.5, duration: 3, repeat: Infinity, ease: "easeInOut" }
               }}
               className="bg-gruvbox-bright-blue bg-opacity-20 hover:bg-opacity-30 text-gruvbox-bright-blue border border-gruvbox-bright-blue border-opacity-50 hover:border-opacity-70 px-8 sm:px-12 py-4 sm:py-5 rounded-lg text-xl sm:text-2xl font-mono transition-all duration-200 w-full sm:w-auto"
             >
