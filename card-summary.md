@@ -249,6 +249,7 @@
 
 ### **Toolkit Strategy:**
 - **15 total items** available throughout the entire game
+- **Maximum 8 rituals per game** - strategic scarcity enforced
 - **One-time use** - each can only be consumed once
 - **Unlock after cards** - must complete card actions first each sprint
 - **Strategic timing** - save powerful boosts for critical moments

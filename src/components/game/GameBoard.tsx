@@ -422,9 +422,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                         {/* VELOCITY & PRODUCTIVITY */}
                         <button
                           onClick={() => performRitual('coffee')}
-                          disabled={gameState.ritualsUsed >= gameState.maxRituals || gameState.cardActionsCompleted === 0}
+                          disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('coffee')}
                           className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
-                            gameState.ritualsUsed >= gameState.maxRituals || gameState.cardActionsCompleted === 0
+                            gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('coffee')
                               ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
                               : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
                           }`}
@@ -439,12 +439,12 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                             <span className="text-gruvbox-bright-green">+4 team</span>
                     </div>
                   </button>
-
-                        <button
+                  
+                  <button
                           onClick={() => performRitual('overtime')}
-                          disabled={gameState.ritualsUsed >= gameState.maxRituals || gameState.cardActionsCompleted === 0}
+                          disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('overtime')}
                           className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
-                            gameState.ritualsUsed >= gameState.maxRituals || gameState.cardActionsCompleted === 0
+                            gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('overtime')
                               ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
                               : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
                           }`}
@@ -462,9 +462,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
 
                         <button
                           onClick={() => performRitual('intern')}
-                          disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.includes('intern')}
+                          disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('intern')}
                           className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
-                            gameState.cardActionsCompleted === 0 || gameState.usedRituals.includes('intern')
+                            gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('intern')
                               ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
                               : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
                           }`}
@@ -484,9 +484,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
 
                         <button
                           onClick={() => performRitual('automation')}
-                          disabled={gameState.usedRituals.includes('automation')}
+                          disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('automation')}
                           className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
-                            gameState.usedRituals.includes('automation')
+                            gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('automation')
                               ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
                               : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
                           }`}
@@ -504,9 +504,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
 
                         <button
                           onClick={() => performRitual('startup')}
-                          disabled={gameState.usedRituals.includes('startup')}
+                          disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('startup')}
                           className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
-                            gameState.usedRituals.includes('startup')
+                            gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('startup')
                               ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
                               : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
                           }`}
@@ -525,9 +525,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                         {/* TEAM & MORALE */}
                         <button
                           onClick={() => performRitual('pastries')}
-                          disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.includes('pastries')}
+                          disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('pastries')}
                           className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
-                            gameState.cardActionsCompleted === 0 || gameState.usedRituals.includes('pastries')
+                            gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('pastries')
                               ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
                               : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
                           }`}
@@ -543,9 +543,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
 
                         <button
                           onClick={() => performRitual('pizza')}
-                          disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.includes('pizza')}
+                          disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('pizza')}
                           className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
-                            gameState.cardActionsCompleted === 0 || gameState.usedRituals.includes('pizza')
+                            gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('pizza')
                               ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
                               : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
                           }`}
@@ -565,9 +565,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
 
                         <button
                           onClick={() => performRitual('inspiration')}
-                          disabled={gameState.usedRituals.includes('inspiration')}
+                          disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('inspiration')}
                           className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
-                            gameState.usedRituals.includes('inspiration')
+                            gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('inspiration')
                               ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
                               : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
                           }`}
@@ -587,9 +587,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
 
                         <button
                           onClick={() => performRitual('mentorship')}
-                          disabled={gameState.usedRituals.includes('mentorship')}
+                          disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('mentorship')}
                           className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
-                            gameState.usedRituals.includes('mentorship')
+                            gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('mentorship')
                               ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
                               : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
                           }`}
@@ -606,11 +606,11 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                         </button>
 
                         {/* QUALITY & TECH DEBT */}
-                        <button
+                  <button
                     onClick={() => performRitual('refactor')}
-                          disabled={gameState.ritualsUsed >= gameState.maxRituals || gameState.cardActionsCompleted === 0}
+                          disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('refactor')}
                           className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
-                            gameState.ritualsUsed >= gameState.maxRituals || gameState.cardActionsCompleted === 0
+                            gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('refactor')
                               ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
                               : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
                           }`}
@@ -628,9 +628,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
 
                         <button
                           onClick={() => performRitual('architect')}
-                          disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.includes('architect')}
+                          disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('architect')}
                           className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
-                            gameState.cardActionsCompleted === 0 || gameState.usedRituals.includes('architect')
+                            gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('architect')
                               ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
                               : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
                           }`}
@@ -651,9 +651,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                         {/* BUSINESS & CLIENT */}
                         <button
                           onClick={() => performRitual('demo')}
-                          disabled={gameState.ritualsUsed >= gameState.maxRituals || gameState.cardActionsCompleted === 0}
+                          disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('demo')}
                           className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
-                            gameState.ritualsUsed >= gameState.maxRituals || gameState.cardActionsCompleted === 0
+                            gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('demo')
                               ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
                               : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
                           }`}
@@ -671,9 +671,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
 
                         <button
                           onClick={() => performRitual('partnership')}
-                          disabled={gameState.usedRituals.includes('partnership')}
+                          disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('partnership')}
                           className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
-                            gameState.usedRituals.includes('partnership')
+                            gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('partnership')
                               ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
                               : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
                           }`}
@@ -692,9 +692,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                         {/* EXTERNAL HELP */}
                         <button
                           onClick={() => performRitual('consultant')}
-                          disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.includes('consultant')}
+                          disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('consultant')}
                           className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
-                            gameState.cardActionsCompleted === 0 || gameState.usedRituals.includes('consultant')
+                            gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('consultant')
                               ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
                               : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
                           }`}
@@ -714,9 +714,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
 
                         <button
                           onClick={() => performRitual('raise')}
-                          disabled={gameState.ritualsUsed >= gameState.maxRituals || gameState.cardActionsCompleted === 0}
+                          disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('raise')}
                           className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
-                            gameState.ritualsUsed >= gameState.maxRituals || gameState.cardActionsCompleted === 0
+                            gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('raise')
                               ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
                               : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
                           }`}
@@ -724,15 +724,15 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                           <div className="flex items-center gap-1 mb-1">
                             <span>💰</span>
                             <span className="font-semibold text-xs">./raise</span>
-                          </div>
+                      </div>
                           <div className="text-xs">
                             <span className="text-gruvbox-bright-green">+15 team</span>
                             <span className="text-gruvbox-dark-fg4 mx-1">•</span>
                             <span className="text-gruvbox-bright-blue">+3 vel</span>
                             <span className="text-gruvbox-dark-fg4 mx-1">•</span>
                             <span className="text-gruvbox-bright-yellow">+5 client</span>
-                          </div>
-                        </button>
+                    </div>
+                  </button>
                 </div>
                 
                       <div className="flex justify-between items-center pt-3 border-t border-gruvbox-dark-bg3">
@@ -782,7 +782,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                     } ${numberAnimations.ritualsAvailable}`}>
                       {gameState.usedRituals.length}
                     </span>
-                    <span className="text-gruvbox-dark-fg4 text-xs">/10</span>
+                    <span className="text-gruvbox-dark-fg4 text-xs">/8</span>
                   </div>
                 </div>
               </div>
