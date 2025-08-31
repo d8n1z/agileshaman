@@ -654,6 +654,6 @@ export const getQuotesByCategory = (category: string): QuoteWithAttribution[] =>
 
 // Get all available categories
 export const getQuoteCategories = (): string[] => {
-  const categories = new Set(PROJECT_QUOTES.map(q => q.category).filter(Boolean));
+  const categories = new Set(PROJECT_QUOTES.map(q => q.category).filter((category): category is string => category !== undefined));
   return Array.from(categories).sort();
 };
