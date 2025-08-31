@@ -65,8 +65,15 @@ export const MYSTICAL_DECK: Card[] = [
       {
         id: 'illusion-magic',
         label: 'Weave Illusion Magic',
-        description: 'Make it appear intelligent without true understanding',
+        description: 'Make it appear intelligent without true understanding - dangerous deception',
         effects: { velocity: +15, techDebt: +25 },
+        ritual: {
+          chance: 0.4,
+          onSuccess: { happiness: +20, velocity: +10 },
+          onFailure: { happiness: -30, velocity: -20, techDebt: +15 },
+          successMessage: 'Illusion holds! Stakeholders are impressed by the "AI" features',
+          failureMessage: 'Illusion shattered! Fake AI exposed, credibility destroyed'
+        },
         icon: '✨'
       }
     ]
@@ -119,8 +126,15 @@ export const MYSTICAL_DECK: Card[] = [
       {
         id: 'astral-projection',
         label: 'Practice Astral Projection',
-        description: 'Be present in body, absent in spirit',
-        effects: {},
+        description: 'Be present in body, absent in spirit - risky mystical technique',
+        effects: { morale: +5 },
+        ritual: {
+          chance: 0.6,
+          onSuccess: { velocity: +8, morale: +10 },
+          onFailure: { velocity: -15, techDebt: +10 },
+          successMessage: 'Astral projection successful! Team transcends physical limitations',
+          failureMessage: 'Lost in the astral plane - team productivity crashes'
+        },
         icon: '👻'
       }
     ]
@@ -1024,7 +1038,15 @@ export const MYSTICAL_DECK: Card[] = [
       {
         id: 'research-spike',
         label: 'Research New Technologies',
-        effects: { velocity: -10, morale: +10, happiness: -5 }
+        description: 'Risky exploration of bleeding-edge tech',
+        effects: { velocity: -10, morale: +10 },
+        ritual: {
+          chance: 0.5,
+          onSuccess: { velocity: +20, techDebt: -15, happiness: +15 },
+          onFailure: { velocity: -25, techDebt: +30, morale: -15 },
+          successMessage: 'Research breakthrough! Team discovers game-changing technology',
+          failureMessage: 'Research rabbit hole! Team lost in complexity, productivity crashes'
+        }
       }
     ]
   },
@@ -1064,7 +1086,7 @@ export const MYSTICAL_DECK: Card[] = [
   {
     id: 'production-fire-friday',
     title: 'The Dreaded Friday 4:45 PM Fire',
-    scenario: 'The clock strikes 4:45 PM on Friday. Bags are packed, weekend plans await. Then... the payment system erupts in errors. Customers can\'t buy, revenue bleeds, and everyone stares at their car keys with hollow eyes.',
+    scenario: '4:45 PM Friday. Weekend plans await. Then... the payment system explodes. Revenue bleeds.',
     icon: '🔥',
     rarity: 'common',
     theme: 'chaos',
@@ -1090,7 +1112,7 @@ export const MYSTICAL_DECK: Card[] = [
   {
     id: 'intern-overwrites-database',
     title: 'The Intern\'s Production Apocalypse',
-    scenario: 'The wide-eyed intern approaches, voice trembling: "I was just testing something in production and... well... half our users don\'t exist anymore." Their bottom lip quivers. The silence in the room could cut code.',
+    scenario: 'The intern trembles: "I was testing in production and... half our users don\'t exist anymore."',
     icon: '😰',
     rarity: 'rare',
     theme: 'chaos',
@@ -1272,7 +1294,7 @@ export const MYSTICAL_DECK: Card[] = [
   {
     id: 'legacy-system-expert-retiring',
     title: 'The Last Keeper of Ancient Code',
-    scenario: 'Bob shuffles to your desk, retirement papers in hand. "Kid," he wheezes, "that server in rack 47? Reboot it every Tuesday at 3 AM or the accounting system summons financial demons." He\'s the only one who remembers why. Tomorrow, he vanishes into golf-course mythology.',
+    scenario: 'Bob shuffles over with retirement papers. "That server in rack 47? Reboot it every Tuesday at 3 AM or the accounting system summons financial demons." Only he knows why.',
     icon: '👴',
     rarity: 'rare',
     theme: 'wisdom',
@@ -1317,6 +1339,849 @@ export const MYSTICAL_DECK: Card[] = [
         id: 'remote-first-defense',
         label: 'Advocate for Remote-First',
         effects: { happiness: -10, morale: +20, velocity: +10 }
+      }
+    ]
+  },
+
+  // More Common Cards - Additional Scenarios
+  {
+    id: 'open-source-contribution',
+    title: 'The Open Source Opportunity',
+    scenario: 'A chance to contribute to a popular open source project emerges. The community beckons, but deadlines loom...',
+    icon: '🌟',
+    rarity: 'common',
+    theme: 'agile',
+    choices: [
+      {
+        id: 'contribute',
+        label: 'Embrace the Open Source Spirit',
+        description: 'Contribute during work hours',
+        effects: { morale: +15, velocity: -8, happiness: +5 }
+      },
+      {
+        id: 'after-hours',
+        label: 'Sacrifice Personal Time',
+        description: 'Contribute in your free time',
+        effects: { morale: +8, velocity: +3, techDebt: -5 }
+      },
+      {
+        id: 'decline',
+        label: 'Focus on Current Sprint',
+        description: 'Politely decline the opportunity',
+        effects: { velocity: +5, morale: -3 }
+      }
+    ]
+  },
+
+  {
+    id: 'security-vulnerability',
+    title: 'The Security Awakening',
+    scenario: 'Critical security vulnerability discovered. Users login with "password123".',
+    icon: '🔐',
+    rarity: 'common',
+    theme: 'chaos',
+    choices: [
+      {
+        id: 'emergency-fix',
+        label: 'Deploy Emergency Hotfix',
+        description: 'All hands on deck for immediate fix',
+        effects: { velocity: -15, morale: -10, techDebt: +8, happiness: +12 }
+      },
+      {
+        id: 'planned-fix',
+        label: 'Plan Systematic Security Audit',
+        description: 'Thorough but slower approach',
+        effects: { velocity: -5, techDebt: -10, morale: +5 }
+      },
+      {
+        id: 'band-aid',
+        label: 'Apply Quick Band-Aid Solution',
+        description: 'Minimal disruption approach',
+        effects: { velocity: +3, techDebt: +15, happiness: +5 },
+        ritual: {
+          chance: 0.3,
+          onFailure: { happiness: -20, techDebt: +25 },
+          failureMessage: 'The band-aid fails spectacularly. Security breach headlines tomorrow.'
+        }
+      }
+    ]
+  },
+
+  {
+    id: 'performance-crisis',
+    title: 'The Great Slowdown',
+    scenario: 'Your app takes 30 seconds to load. Users are abandoning ship.',
+    icon: '🐌',
+    rarity: 'common',
+    theme: 'chaos',
+    choices: [
+      {
+        id: 'optimize',
+        label: 'Deep Performance Optimization',
+        description: 'Profile and optimize systematically',
+        effects: { velocity: -10, techDebt: -15, morale: +8, happiness: +15 }
+      },
+      {
+        id: 'cdn',
+        label: 'Throw CDN at the Problem',
+        description: 'Expensive but fast solution',
+        effects: { velocity: +5, happiness: +10, morale: -3 }
+      },
+      {
+        id: 'blame-users',
+        label: 'Blame User Internet Connections',
+        description: 'Deflect responsibility',
+        effects: { velocity: +8, happiness: -15, morale: -5 }
+      }
+    ]
+  },
+
+  {
+    id: 'documentation-debt',
+    title: 'The Documentation Void',
+    scenario: 'New team member asks "How does this work?" You realize there is zero documentation. Anywhere.',
+    icon: '📚',
+    rarity: 'common',
+    theme: 'agile',
+    choices: [
+      {
+        id: 'write-docs',
+        label: 'Write Comprehensive Documentation',
+        description: 'Finally tackle the doc debt',
+        effects: { velocity: -12, morale: +10, techDebt: -8 }
+      },
+      {
+        id: 'code-comments',
+        label: 'Add Inline Comments Only',
+        description: 'Minimal effort approach',
+        effects: { velocity: -5, techDebt: -3, morale: +2 }
+      },
+      {
+        id: 'mentorship',
+        label: 'Pair Programming Knowledge Transfer',
+        description: 'Teach through doing',
+        effects: { velocity: -8, morale: +15, happiness: +5 }
+      }
+    ]
+  },
+
+  {
+    id: 'api-versioning',
+    title: 'The Versioning Nightmare',
+    scenario: 'Your API now has v1, v2, v3, v2.1, and v2.5. Clients are using all of them. Chaos reigns supreme.',
+    icon: '🔀',
+    rarity: 'rare',
+    theme: 'chaos',
+    choices: [
+      {
+        id: 'deprecate',
+        label: 'Force Deprecation of Old Versions',
+        description: 'Break things to fix them',
+        effects: { velocity: +10, happiness: -20, techDebt: -15 },
+        ritual: {
+          chance: 0.4,
+          onFailure: { happiness: -30, morale: -15 },
+          failureMessage: 'Major clients revolt. Emergency meetings all day.'
+        }
+      },
+      {
+        id: 'maintain-all',
+        label: 'Support All Versions Forever',
+        description: 'The path of eternal suffering',
+        effects: { velocity: -15, techDebt: +20, morale: -10 }
+      },
+      {
+        id: 'migration-plan',
+        label: 'Create Gradual Migration Plan',
+        description: 'The diplomatic approach',
+        effects: { velocity: -8, happiness: +8, techDebt: -5, morale: +5 }
+      }
+    ]
+  },
+
+  {
+    id: 'mobile-responsive',
+    title: 'The Mobile Awakening',
+    scenario: 'Someone finally checks your app on mobile. It looks like it was designed in 1999. On a Nokia.',
+    icon: '📱',
+    rarity: 'common',
+    theme: 'agile',
+    choices: [
+      {
+        id: 'responsive-design',
+        label: 'Implement Proper Responsive Design',
+        description: 'Do it right from scratch',
+        effects: { velocity: -15, techDebt: -10, happiness: +15, morale: +5 }
+      },
+      {
+        id: 'mobile-app',
+        label: 'Create Separate Mobile App',
+        description: 'Start a new project',
+        effects: { velocity: -20, morale: +10, happiness: +20, techDebt: +5 }
+      },
+      {
+        id: 'ignore',
+        label: 'Add "Best Viewed on Desktop" Notice',
+        description: 'The ostrich approach',
+        effects: { velocity: +5, happiness: -12, morale: -3 }
+      }
+    ]
+  },
+
+  {
+    id: 'tech-conference',
+    title: 'The Conference Temptation',
+    scenario: 'The hottest tech conference is happening next week. Keynote promises to "revolutionize everything" (again).',
+    icon: '🎤',
+    rarity: 'common',
+    theme: 'agile',
+    choices: [
+      {
+        id: 'attend',
+        label: 'Send Team to Conference',
+        description: 'Investment in learning',
+        effects: { velocity: -10, morale: +15, happiness: +5, techDebt: -3 }
+      },
+      {
+        id: 'watch-online',
+        label: 'Stream Sessions Remotely',
+        description: 'Budget-friendly learning',
+        effects: { velocity: -3, morale: +5, techDebt: -1 }
+      },
+      {
+        id: 'skip',
+        label: 'Focus on Current Work',
+        description: 'Prioritize deadlines',
+        effects: { velocity: +8, morale: -5, happiness: +3 }
+      }
+    ]
+  },
+
+  {
+    id: 'database-migration',
+    title: 'The Great Database Migration',
+    scenario: 'Time to migrate from ancient MySQL 5.6. Your production data is... questionable.',
+    icon: '🗄️',
+    rarity: 'rare',
+    theme: 'chaos',
+    choices: [
+      {
+        id: 'careful-migration',
+        label: 'Meticulous Step-by-Step Migration',
+        description: 'Slow but safe approach',
+        effects: { velocity: -20, techDebt: -20, morale: +5, happiness: +10 }
+      },
+      {
+        id: 'yolo-migration',
+        label: 'Weekend Big Bang Migration',
+        description: 'Risky but fast',
+        effects: { velocity: +5, morale: -15 },
+        ritual: {
+          chance: 0.5,
+          onSuccess: { techDebt: -25, happiness: +20 },
+          onFailure: { velocity: -30, happiness: -25, techDebt: +30 },
+          successMessage: 'Migration succeeds flawlessly! You are the database wizard!',
+          failureMessage: 'Data corruption detected. Monday is going to be... interesting.'
+        }
+      },
+      {
+        id: 'postpone',
+        label: 'Postpone Until Next Quarter',
+        description: 'Kick the can down the road',
+        effects: { velocity: +8, techDebt: +10, morale: -3 }
+      }
+    ]
+  },
+
+  {
+    id: 'ai-integration',
+    title: 'The AI Revolution (Again)',
+    scenario: 'Management wants to "integrate AI into everything." They saw a ChatGPT demo and now think you can automate creativity.',
+    icon: '🤖',
+    rarity: 'common',
+    theme: 'mystical',
+    choices: [
+      {
+        id: 'implement-ai',
+        label: 'Build Comprehensive AI Features',
+        description: 'Embrace the AI hype fully',
+        effects: { velocity: -15, happiness: +15, techDebt: +10, morale: -5 }
+      },
+      {
+        id: 'smart-integration',
+        label: 'Add Targeted AI Where It Makes Sense',
+        description: 'Strategic implementation',
+        effects: { velocity: -8, happiness: +10, techDebt: -3, morale: +5 }
+      },
+      {
+        id: 'ai-washing',
+        label: 'Rebrand Existing Features as "AI-Powered"',
+        description: 'Marketing magic',
+        effects: { velocity: +3, happiness: +8, morale: -8 }
+      }
+    ]
+  },
+
+  {
+    id: 'startup-acquisition',
+    title: 'The Acquisition Rumors',
+    scenario: 'Word spreads that your startup might be acquired. Half the team is polishing resumes, the other half is planning yacht purchases.',
+    icon: '💰',
+    rarity: 'rare',
+    theme: 'mystical',
+    choices: [
+      {
+        id: 'transparency',
+        label: 'Full Transparency About Uncertainty',
+        description: 'Honest communication',
+        effects: { morale: +10, velocity: -5, happiness: +5 }
+      },
+      {
+        id: 'distraction-free',
+        label: 'Ban All Acquisition Discussions',
+        description: 'Focus on work only',
+        effects: { velocity: +8, morale: -10, happiness: +3 }
+      },
+      {
+        id: 'celebration',
+        label: 'Pre-Celebrate with Team Party',
+        description: 'Optimistic approach',
+        effects: { morale: +20, velocity: -12, happiness: +8 },
+        ritual: {
+          chance: 0.6,
+          onSuccess: { happiness: +15, morale: +10 },
+          onFailure: { morale: -15, happiness: -10 },
+          successMessage: 'Acquisition confirmed! Champagne for everyone!',
+          failureMessage: 'Acquisition falls through. Awkward silence fills the office.'
+        }
+      }
+    ]
+  },
+
+  // Additional Developer Life Cards
+  {
+    id: 'design-system-wars',
+    title: 'The Great Styling Wars',
+    scenario: 'Frontend devs wage holy war over Tailwind vs Styled Components vs CSS-in-JS. The Slack thread has reached 500 replies and three developers have left the company.',
+    icon: '🎨',
+    rarity: 'common',
+    theme: 'chaos',
+    choices: [
+      {
+        id: 'let-fight',
+        label: 'Let Democracy Burn',
+        description: 'Watch the world burn in beautiful, semantic flames',
+        effects: { velocity: -15, morale: +10 }
+      },
+      {
+        id: 'force-choice',
+        label: 'Enforce Benevolent Dictatorship',
+        description: 'Pick one and execute the heretics',
+        effects: { velocity: +10, morale: -15 }
+      },
+      {
+        id: 'buy-theme',
+        label: 'Purchase Corporate Bootstrap Theme',
+        description: 'Surrender artistic integrity for peace',
+        effects: { happiness: -10, velocity: +5, techDebt: +8 }
+      }
+    ]
+  },
+
+  {
+    id: 'compliance-audit',
+    title: 'The Compliance Inquisition',
+    scenario: 'External auditors arrive with clipboards and disappointed expressions. They seek documentation. Your README was last updated when React had class components.',
+    icon: '📋',
+    rarity: 'rare',
+    theme: 'chaos',
+    choices: [
+      {
+        id: 'write-docs',
+        label: 'Confess and Document Everything',
+        description: 'Embrace the virtue of transparency',
+        effects: { velocity: -15, happiness: +10, techDebt: -5 }
+      },
+      {
+        id: 'ignore-audit',
+        label: 'Hide in the Server Room',
+        description: 'They can\'t audit what they can\'t find',
+        effects: { velocity: +10, techDebt: +20, morale: -5 }
+      },
+      {
+        id: 'bluff-slides',
+        label: 'Deploy PowerPoint Smoke Screen',
+        description: 'Dazzle them with bullet points and synergy',
+        effects: { velocity: +5, happiness: -5, morale: -3 }
+      }
+    ]
+  },
+
+  {
+    id: 'infinite-retro',
+    title: 'The Eternal Retrospective',
+    scenario: 'The retrospective has transcended time and space. Someone brought feelings. Another brought childhood trauma. The sprint board has become a therapy session whiteboard.',
+    icon: '🔄',
+    rarity: 'common',
+    theme: 'agile',
+    choices: [
+      {
+        id: 'join-fully',
+        label: 'Embrace the Sacred Healing Circle',
+        description: 'Unlock your inner child and outer frustrations',
+        effects: { morale: +20, velocity: -20 }
+      },
+      {
+        id: 'skip-early',
+        label: 'Execute Tactical Irish Exit',
+        description: 'Vanish like a ninja when nobody\'s looking',
+        effects: { velocity: +10, morale: -10 }
+      },
+      {
+        id: 'meta-meeting',
+        label: 'Schedule Meta-Retro Meeting',
+        description: 'Retrospect about retrospecting retrospectively',
+        effects: { happiness: -5, velocity: -3, techDebt: +5 }
+      }
+    ]
+  },
+
+  {
+    id: 'hero-developer',
+    title: 'The Fallen Code Warrior',
+    scenario: 'Your 10x developer has ascended to become a 0x developer. They carried the entire sprint on their back, then their back gave out. Nobody else knows the arcane deployment incantations.',
+    icon: '🦸',
+    rarity: 'common',
+    theme: 'chaos',
+    choices: [
+      {
+        id: 'celebrate-hero',
+        label: 'Build Shrine to the Fallen Hero',
+        description: 'Encourage others to burn themselves out too',
+        effects: { velocity: +15, morale: -20 }
+      },
+      {
+        id: 'share-work',
+        label: 'Establish Knowledge Democracy',
+        description: 'Distribute the burden like a proper communist',
+        effects: { morale: +10, velocity: -10, techDebt: -5 }
+      },
+      {
+        id: 'replace-intern',
+        label: 'Deploy Emergency Intern',
+        description: 'Fresh blood for the code grinder',
+        effects: { velocity: +10, techDebt: +20, morale: -5 }
+      }
+    ]
+  },
+
+  {
+    id: 'framework-migration',
+    title: 'The Framework Fever Dream',
+    scenario: 'Your PO discovered React 19 on Hacker News and now demands a complete rewrite. "This will revolutionize everything!" they cry, while your perfectly functional Vue app weeps in the corner.',
+    icon: '🔧',
+    rarity: 'rare',
+    theme: 'chaos',
+    choices: [
+      {
+        id: 'agree-migrate',
+        label: 'Embrace the Shiny New Thing',
+        description: 'Burn everything and start fresh like a phoenix',
+        effects: { velocity: -20, happiness: +10, techDebt: +15 }
+      },
+      {
+        id: 'delay-migrate',
+        label: 'Strategic Procrastination',
+        description: 'Maybe they\'ll forget by Q4',
+        effects: { velocity: +10, happiness: -10 }
+      },
+      {
+        id: 'pretend-migrate',
+        label: 'Create Migration Theater',
+        description: 'Rename some files and hope for the best',
+        effects: { velocity: +10, morale: -5, techDebt: +8 }
+      }
+    ]
+  },
+
+  {
+    id: 'legendary-jira',
+    title: 'The Ancient Jira Artifact',
+    scenario: 'A Jira ticket from the Before Times has awakened from its slumber. Created in 2018, assigned to "Sarah from QA" who left for Google three years ago. The description reads only: "fix the thing".',
+    icon: '🎫',
+    rarity: 'common',
+    theme: 'mystical',
+    choices: [
+      {
+        id: 'close-ticket',
+        label: 'Execute Order Won\'t-Fix',
+        description: 'Some mysteries are meant to remain unsolved',
+        effects: { velocity: +10, morale: +3 }
+      },
+      {
+        id: 'research-ticket',
+        label: 'Conduct Archaeological Dig',
+        description: 'Channel your inner Indiana Jones through Git history',
+        effects: { velocity: -10, happiness: +10, techDebt: -3 }
+      },
+      {
+        id: 'assign-intern',
+        label: 'Sacrifice the Junior Developer',
+        description: 'Traditional hazing ritual',
+        effects: { velocity: +3, morale: -3 }
+      }
+    ]
+  },
+
+  {
+    id: 'manager-reorg',
+    title: 'The Great Org Chart Shuffle',
+    scenario: 'You wake up to find the org chart has been restructured by the chaos gods. Your manager now reports to the intern you trained last month. The intern is 22 and has strong opinions about blockchain.',
+    icon: '📊',
+    rarity: 'common',
+    theme: 'chaos',
+    choices: [
+      {
+        id: 'accept-reorg',
+        label: 'Bow to Your New Crypto Overlord',
+        description: 'Adapt like a chameleon in a rainbow factory',
+        effects: { morale: -10, velocity: +10, happiness: +5 }
+      },
+      {
+        id: 'resist-reorg',
+        label: 'Form the Old Guard Resistance',
+        description: 'Vive la révolution!',
+        effects: { morale: +10, happiness: -10 }
+      },
+      {
+        id: 'ignore-reorg',
+        label: 'Master the Art of Selective Blindness',
+        description: 'What org chart? I see no org chart',
+        effects: { velocity: +5, morale: +3 }
+      }
+    ]
+  },
+
+  {
+    id: 'budget-freeze',
+    title: 'The Great AWS Apocalypse',
+    scenario: 'Finance has discovered your AWS bill exceeds the GDP of small nations. They\'ve frozen the cloud budget and demand you "optimize synergies" and "leverage cost efficiencies". Your production servers are literally on fire.',
+    icon: '🧊',
+    rarity: 'common',
+    theme: 'chaos',
+    choices: [
+      {
+        id: 'reduce-servers',
+        label: 'Embrace the Potato Server Life',
+        description: 'Run everything on a Raspberry Pi and prayer',
+        effects: { techDebt: +20, happiness: -10, velocity: -5 }
+      },
+      {
+        id: 'negotiate-budget',
+        label: 'Channel Your Inner Diplomat',
+        description: 'Explain why uptime is actually important',
+        effects: { velocity: -10, morale: +10, happiness: +8 }
+      },
+      {
+        id: 'blame-dev-tools',
+        label: 'Sacrifice the IntelliJ Licenses',
+        description: 'Throw expensive tools under the bus',
+        effects: { morale: -5, velocity: +10 }
+      }
+    ]
+  },
+
+  {
+    id: 'okr-alignment',
+    title: 'The OKR Alignment Ceremony',
+    scenario: 'The Business Shamans demand perfect alignment between your humble bug fixes and the Sacred Quarterly Objectives. Every semicolon must contribute to measurable key results. Even your bathroom breaks need KPIs.',
+    icon: '🎯',
+    rarity: 'common',
+    theme: 'agile',
+    choices: [
+      {
+        id: 'do-alignment',
+        label: 'Achieve Perfect Corporate Harmony',
+        description: 'Map every keystroke to business value',
+        effects: { velocity: -10, happiness: +10 }
+      },
+      {
+        id: 'fake-alignment',
+        label: 'Deploy Bureaucratic Illusion Magic',
+        description: 'Create documents that look important',
+        effects: { velocity: +5, morale: -3 }
+      },
+      {
+        id: 'push-back-okr',
+        label: 'Rebel Against the Machine',
+        description: 'Defend the sacred art of actual coding',
+        effects: { happiness: -15, morale: +10 }
+      }
+    ]
+  },
+
+  {
+    id: 'analytics-crisis',
+    title: 'The Dashboard Deception',
+    scenario: 'Your analytics dashboard has achieved sentience and is now lying to everyone. User count shows 150% growth while revenue shows 80% decline. The charts are creating impossible geometries. Reality is breaking down.',
+    icon: '📈',
+    rarity: 'common',
+    theme: 'chaos',
+    choices: [
+      {
+        id: 'rebuild-analytics',
+        label: 'Rebuild the Truth Engine',
+        description: 'Restore order to the chaos of numbers',
+        effects: { velocity: -20, happiness: +10, techDebt: -10 }
+      },
+      {
+        id: 'ignore-analytics',
+        label: 'Trust Your Gut Like a Caveman',
+        description: 'Numbers are for people who lack intuition',
+        effects: { velocity: +10, happiness: -5 }
+      },
+      {
+        id: 'screenshot-reports',
+        label: 'Master the Ancient Art of Chart Photography',
+        description: 'Static images can\'t lie if you crop them right',
+        effects: { velocity: +3, morale: -5 }
+      }
+    ]
+  },
+
+  {
+    id: 'coffee-machine',
+    title: 'Coffee Machine Broken',
+    scenario: 'The coffee machine stopped working. Productivity plummets. Morale in free fall.',
+    icon: '☕',
+    rarity: 'common',
+    theme: 'chaos',
+    choices: [
+      {
+        id: 'fix-coffee',
+        label: 'Emergency Coffee Machine Repair',
+        description: 'Priority zero incident',
+        effects: { velocity: -5, morale: +10 }
+      },
+      {
+        id: 'ignore-coffee',
+        label: 'Ignore the Crisis',
+        description: 'Let them drink water',
+        effects: { morale: -15, velocity: -8 }
+      },
+      {
+        id: 'tea-replacement',
+        label: 'Replace with Premium Tea',
+        description: 'Sophisticated alternative',
+        effects: { happiness: +5, morale: -5 }
+      }
+    ]
+  },
+
+  {
+    id: 'recruitment-candidate',
+    title: 'Recruitment Candidate',
+    scenario: 'A promising candidate appears for interview. They want 40% above budget and remote work.',
+    icon: '👥',
+    rarity: 'common',
+    theme: 'agile',
+    choices: [
+      {
+        id: 'hire-quickly',
+        label: 'Hire Quickly Before They Leave',
+        description: 'Desperate times',
+        effects: { velocity: +10, morale: -10, happiness: -5 }
+      },
+      {
+        id: 'evaluate-carefully',
+        label: 'Thorough Evaluation Process',
+        description: 'Due diligence',
+        effects: { velocity: -10, morale: +10 }
+      },
+      {
+        id: 'leetcode-test',
+        label: 'Give Them LeetCode Problems',
+        description: 'Traditional hazing',
+        effects: { happiness: +10, morale: -3 }
+      }
+    ]
+  },
+
+  {
+    id: 'monorepo-merge',
+    title: 'Monorepo Merge',
+    scenario: 'Attempting to merge all 15 repositories into one glorious monorepo. Git history will be... interesting.',
+    icon: '📁',
+    rarity: 'rare',
+    theme: 'chaos',
+    choices: [
+      {
+        id: 'attempt-merge',
+        label: 'YOLO Full Merge',
+        description: 'Courage over caution',
+        effects: { velocity: -20, techDebt: +20 },
+        ritual: {
+          chance: 0.3,
+          onFailure: { velocity: -30, techDebt: +35, morale: -15 },
+          failureMessage: 'Git history explodes. Senior developers are found crying.'
+        }
+      },
+      {
+        id: 'delay-merge',
+        label: 'Postpone Until Q4',
+        description: 'Strategic delay',
+        effects: { velocity: +10, happiness: -10 }
+      },
+      {
+        id: 'hire-guru',
+        label: 'Hire Git Guru Consultant',
+        description: 'Outsource the pain',
+        effects: { morale: -10, happiness: +5, velocity: -5 }
+      }
+    ]
+  },
+
+  {
+    id: 'api-contract-break',
+    title: 'API Contract Break',
+    scenario: 'A downstream service breaks API compatibility. Your integration is now returning 418 I\'m a teapot.',
+    icon: '🔌',
+    rarity: 'common',
+    theme: 'chaos',
+    choices: [
+      {
+        id: 'patch-quickly',
+        label: 'Quick Patch Fix',
+        description: 'Band-aid solution',
+        effects: { velocity: +10, techDebt: +10 }
+      },
+      {
+        id: 'refactor-integration',
+        label: 'Proper Integration Refactor',
+        description: 'Do it right',
+        effects: { velocity: -15, techDebt: -10, morale: +10 }
+      },
+      {
+        id: 'ignore-break',
+        label: 'Ignore Until Users Complain',
+        description: 'Let it burn',
+        effects: { velocity: +5, happiness: -10 }
+      }
+    ]
+  },
+
+  {
+    id: 'pagerduty-hell',
+    title: 'PagerDuty Hell',
+    scenario: '5am, alerts everywhere. The monitoring system is monitoring the monitoring system monitoring itself.',
+    icon: '🚨',
+    rarity: 'common',
+    theme: 'chaos',
+    choices: [
+      {
+        id: 'wake-ops',
+        label: 'Wake Up the Ops Team',
+        description: 'Share the misery',
+        effects: { velocity: +10, morale: -15 }
+      },
+      {
+        id: 'silence-alarms',
+        label: 'Silence All Alarms',
+        description: 'Peace through ignorance',
+        effects: { techDebt: +20, morale: +5 }
+      },
+      {
+        id: 'timezone-excuse',
+        label: 'Blame Different Time Zones',
+        description: 'Geographic deflection',
+        effects: { happiness: -10, velocity: +3 }
+      }
+    ]
+  },
+
+  {
+    id: 'vendor-lockin',
+    title: 'Vendor Lock-in',
+    scenario: 'That SaaS tool just tripled its price. You\'re now paying more for analytics than your developers\' salaries.',
+    icon: '🔒',
+    rarity: 'rare',
+    theme: 'chaos',
+    choices: [
+      {
+        id: 'migrate-vendor',
+        label: 'Migrate to Alternative',
+        description: 'Freedom ain\'t free',
+        effects: { velocity: -20, morale: +10, techDebt: +5 }
+      },
+      {
+        id: 'accept-price',
+        label: 'Accept the New Pricing',
+        description: 'Bend the knee',
+        effects: { happiness: -15, velocity: +10 }
+      },
+      {
+        id: 'build-own',
+        label: 'Build Your Own Version',
+        description: 'NIH syndrome activated',
+        effects: { velocity: -20, techDebt: +20, morale: +5 }
+      }
+    ]
+  },
+
+  {
+    id: 'gamified-retro',
+    title: 'Gamified Retrospective',
+    scenario: 'Someone suggests playing Agile Shaman during the retrospective. Meta levels are dangerously high.',
+    icon: '🎮',
+    rarity: 'legendary',
+    theme: 'mystical',
+    choices: [
+      {
+        id: 'embrace-meta',
+        label: 'Embrace the Meta',
+        description: 'Recursive improvement',
+        effects: { morale: +10, velocity: -5 }
+      },
+      {
+        id: 'resist-meta',
+        label: 'Resist the Gamification',
+        description: 'Stay grounded',
+        effects: { morale: -10, velocity: +5 }
+      },
+      {
+        id: 'declare-meta',
+        label: 'Declare Fourth Wall Break',
+        description: 'Acknowledge the simulation',
+        effects: { morale: +15, happiness: +10, velocity: +5 }
+      }
+    ]
+  },
+
+  {
+    id: 'ai-consultant',
+    title: 'The Silicon Oracle Awakens',
+    scenario: 'An AI consultant has joined your team to "optimize synergistic delivery patterns." It immediately suggests rewriting everything in Rust, implementing blockchain, and replacing all humans with TypeScript interfaces.',
+    icon: '🤖',
+    rarity: 'common',
+    theme: 'mystical',
+    choices: [
+      {
+        id: 'trust-ai',
+        label: 'Submit to Our New Silicon Overlord',
+        description: 'All hail the algorithmic master race',
+        effects: { velocity: +10, techDebt: +5 }
+      },
+      {
+        id: 'mock-ai',
+        label: 'Mock the False Prophet',
+        description: 'Assert human superiority through sarcasm',
+        effects: { morale: +10, happiness: -10 }
+      },
+      {
+        id: 'ai-standups',
+        label: 'Let It Run Daily Standups',
+        description: 'Finally, someone worse at meetings than humans',
+        effects: { velocity: +5, morale: -5, happiness: +8 }
       }
     ]
   }

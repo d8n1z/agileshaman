@@ -1,121 +1,356 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { BACKGROUND_QUOTES } from '../data/quotes';
 
 interface LandingPageProps {
   onStartGame: () => void;
+  onBrowseCards: () => void;
 }
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onStartGame }) => {
+
+
+export const LandingPage: React.FC<LandingPageProps> = ({ onStartGame, onBrowseCards }) => {
+  const [floatingQuotes, setFloatingQuotes] = useState<Array<{id: number, text: string, x: number, y: number, delay: number}>>([]);
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
+
+  // Generate floating quotes - distributed around center with safe radius
+  useEffect(() => {
+    // Use only a subset of quotes to reduce density - much sparser
+    const selectedQuotes = BACKGROUND_QUOTES.filter((_, index) => index % 6 === 0); // Use every 6th quote (~7-8 quotes total)
+    
+    const quotes = selectedQuotes.map((quote, index) => {
+      let x, y;
+      let attempts = 0;
+      const maxAttempts = 50;
+      
+      // Keep trying until we find a position outside the center safe zone
+      do {
+        x = Math.random() * 90 + 5; // 5-95% from left
+        y = Math.random() * 90 + 5; // 5-95% from top
+        
+        // Calculate distance from center (50%, 50%)
+        const distanceFromCenter = Math.sqrt(
+          Math.pow(x - 50, 2) + Math.pow(y - 50, 2)
+        );
+        
+        // Safe radius around center (adjust this value to control exclusion zone)
+        const safeRadius = 35; // Larger radius = more space around center
+        
+        if (distanceFromCenter > safeRadius) {
+          break; // Position is good, outside safe zone
+        }
+        
+        attempts++;
+      } while (attempts < maxAttempts);
+      
+      // If we couldn't find a good position, place it on the edges
+      if (attempts >= maxAttempts) {
+        const edge = Math.floor(Math.random() * 4);
+        switch(edge) {
+          case 0: x = Math.random() * 15 + 5; break;  // Left edge
+          case 1: x = Math.random() * 15 + 80; break; // Right edge  
+          case 2: y = Math.random() * 15 + 5; break;  // Top edge
+          case 3: y = Math.random() * 15 + 80; break; // Bottom edge
+        }
+      }
+      
+      return {
+        id: index,
+        text: quote,
+        x,
+        y,
+        delay: Math.random() * 40 // 0-40s delay for much more spread
+      };
+    });
+    setFloatingQuotes(quotes);
+  }, []);
+
+  // Background Option 1: Subtle Dot Pattern (CURRENT) - Clean tech aesthetic
+  const subtleDotBackground = (
+    <div className="absolute inset-0 opacity-10" style={{
+      backgroundImage: `radial-gradient(circle at 1px 1px, rgba(251,241,199,0.3) 1px, transparent 0)`,
+      backgroundSize: '20px 20px'
+    }}></div>
+  );
+
   return (
-    <div className="h-screen bg-gruvbox-dark-bg0 flex items-center justify-center p-4 overflow-hidden">
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-4xl mx-auto text-center h-full flex flex-col justify-center"
-      >
-        {/* Title */}
-        <motion.div
-          initial={{ scale: 0.8 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.2 }}
-          className="mb-8"
+    <div className="h-screen bg-gruvbox-dark-bg0 flex flex-col overflow-hidden relative">
+      {/* ACTIVE BACKGROUND */}
+      {subtleDotBackground}
+      
+      {/* Floating Quotes Animation */}
+      {floatingQuotes.map((quote, index) => {
+        // Cycle through vibrant Gruvbox colors
+        const colors = [
+          'text-gruvbox-bright-red',
+          'text-gruvbox-bright-green', 
+          'text-gruvbox-bright-yellow',
+          'text-gruvbox-bright-blue',
+          'text-gruvbox-bright-purple',
+          'text-gruvbox-bright-aqua',
+          'text-gruvbox-bright-orange'
+        ];
+        const colorClass = colors[index % colors.length];
+        
+        return (
+          <motion.div
+            key={quote.id}
+            className={`absolute ${colorClass} text-sm font-mono pointer-events-none select-none z-0`}
+            style={{
+              left: `${quote.x}%`,
+              top: `${quote.y}%`,
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ 
+              opacity: [0, 0.15, 0.4, 0.15, 0],
+            }}
+            transition={{
+              duration: 6,
+              delay: quote.delay,
+              repeat: Infinity,
+              repeatDelay: 8,
+              ease: "easeInOut"
+            }}
+          >
+            <motion.span
+              animate={{
+                textShadow: [
+                  "0 0 1px currentColor",
+                  "0 0 4px currentColor", 
+                  "0 0 8px currentColor",
+                  "0 0 4px currentColor",
+                  "0 0 1px currentColor"
+                ],
+                filter: [
+                  "brightness(0.8)",
+                  "brightness(1.1)",
+                  "brightness(1.3)", 
+                  "brightness(1.1)",
+                  "brightness(0.8)"
+                ]
+              }}
+              transition={{
+                duration: 6,
+                delay: quote.delay,
+                repeat: Infinity,
+                repeatDelay: 8,
+                ease: "easeInOut"
+              }}
+            >
+              {quote.text}
+            </motion.span>
+          </motion.div>
+        );
+      })}
+      <div className="flex-1 flex items-center justify-center p-4 relative z-10">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-4xl mx-auto text-center flex flex-col justify-center"
         >
-          <h1 className="text-6xl font-bold text-gruvbox-bright-yellow mb-4 font-mono">
-            Agile Shaman
-          </h1>
-          <div className="text-gruvbox-dark-fg2 text-xl">
-            Master the Ancient Arts of Sprint Management
-          </div>
-        </motion.div>
 
-                       {/* Game Description */}
-               <motion.div
-                 initial={{ opacity: 0 }}
-                 animate={{ opacity: 1 }}
-                 transition={{ delay: 0.4 }}
-                 className="terminal-card p-8 mb-8 text-left max-w-5xl mx-auto"
-               >
-          <div className="text-gruvbox-bright-aqua mb-6 font-mono text-lg">
-            🎮 Sprint Management Survival Game
-          </div>
-          
-          <div className="text-gruvbox-dark-fg2 leading-relaxed space-y-4 text-base">
-            <p>
-              <span className="text-gruvbox-bright-yellow text-lg">Your Mission:</span> Guide your development team through 8 challenging sprints to achieve software delivery enlightenment.
-            </p>
-            
-            <p>
-              Balance four critical aspects of software development while navigating the chaos of modern tech teams:
-            </p>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-6">
-              <div className="bg-gruvbox-dark-bg2 p-3 rounded">
-                <span className="text-gruvbox-bright-blue text-lg">⚡ Velocity</span>
-                <div className="text-sm text-gruvbox-dark-fg3">Feature delivery speed</div>
-              </div>
-              <div className="bg-gruvbox-dark-bg2 p-3 rounded">
-                <span className="text-gruvbox-bright-green text-lg">♡ Team Spirit</span>
-                <div className="text-sm text-gruvbox-dark-fg3">Developer motivation & happiness</div>
-              </div>
-              <div className="bg-gruvbox-dark-bg2 p-3 rounded">
-                <span className="text-gruvbox-bright-yellow text-lg">★ Client Satisfaction</span>
-                <div className="text-sm text-gruvbox-dark-fg3">Stakeholder happiness</div>
-              </div>
-              <div className="bg-gruvbox-dark-bg2 p-3 rounded">
-                <span className="text-gruvbox-bright-red text-lg">⚠ Technical Debt</span>
-                <div className="text-sm text-gruvbox-dark-fg3">Code quality burden</div>
-              </div>
+                    {/* Title with Logo */}
+          <motion.div
+            initial={{ scale: 0.8 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.05 }}
+            className="mb-6"
+          >
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 mb-4">
+              <img
+                src="./logo.png"
+                alt="Agile Shaman"
+                className="w-16 h-16 sm:w-24 sm:h-24 object-contain"
+              />
+              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-normal text-gruvbox-bright-yellow font-mono text-center">
+                Agile Shaman
+              </h1>
+              <img
+                src="./logo.png"
+                alt="Agile Shaman"
+                className="w-16 h-16 sm:w-24 sm:h-24 object-contain hidden sm:block"
+              />
             </div>
-            
-            <p>
-              <span className="text-gruvbox-bright-yellow text-lg">How to Play:</span> Each sprint, face 3 scenario cards. Make 2 strategic decisions that will affect your team's destiny. Use bonus rituals wisely - they're limited!
-            </p>
+          </motion.div>
+
+          {/* Pure and mysterious - no subtitle */}
+
+          {/* Action Buttons */}
+          <motion.div 
+            className="flex flex-col sm:flex-row gap-4 items-center justify-center mb-8"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.15 }}
+          >
+            <motion.button
+              onClick={onStartGame}
+              whileHover={{ scale: 1.05, rotateY: 5 }}
+              whileTap={{ scale: 0.95 }}
+              initial={{ opacity: 0, x: -50, rotateX: -15 }}
+              animate={{ 
+                opacity: 1, 
+                x: 0, 
+                rotateX: 0,
+                y: [0, -3, 0],
+                boxShadow: [
+                  "0 4px 6px rgba(0, 0, 0, 0.1)",
+                  "0 8px 15px rgba(250, 189, 47, 0.3)",
+                  "0 4px 6px rgba(0, 0, 0, 0.1)"
+                ]
+              }}
+              transition={{ 
+                opacity: { delay: 0.2, duration: 0.6, type: "spring", stiffness: 100 },
+                x: { delay: 0.2, duration: 0.6, type: "spring", stiffness: 100 },
+                rotateX: { delay: 0.2, duration: 0.6, type: "spring", stiffness: 100 },
+                y: { delay: 1, duration: 0.8, repeat: Infinity, ease: "easeInOut" },
+                boxShadow: { delay: 1, duration: 0.8, repeat: Infinity, ease: "easeInOut" }
+              }}
+              className="bg-gruvbox-bright-yellow bg-opacity-20 hover:bg-opacity-30 text-gruvbox-bright-yellow border border-gruvbox-bright-yellow border-opacity-50 hover:border-opacity-70 px-8 sm:px-12 py-4 sm:py-5 rounded-lg text-xl sm:text-2xl font-mono transition-all duration-200 w-full sm:w-auto"
+            >
+              <span className="text-gruvbox-bright-green">$</span> ./start
+            </motion.button>
+
+            <motion.button
+              onClick={() => setShowHowToPlay(true)}
+              whileHover={{ scale: 1.05, rotateY: -5 }}
+              whileTap={{ scale: 0.95 }}
+              initial={{ opacity: 0, y: 50, rotateX: 15 }}
+              animate={{ 
+                opacity: 1, 
+                y: 0, 
+                rotateX: 0,
+                rotateZ: [0, 1, -1, 0],
+                borderOpacity: [0.5, 0.8, 0.5]
+              }}
+              transition={{ 
+                opacity: { delay: 0.3, duration: 0.6, type: "spring", stiffness: 100 },
+                y: { delay: 0.3, duration: 0.6, type: "spring", stiffness: 100 },
+                rotateX: { delay: 0.3, duration: 0.6, type: "spring", stiffness: 100 },
+                rotateZ: { delay: 1.5, duration: 3, repeat: Infinity, ease: "easeInOut" },
+                borderOpacity: { delay: 1.5, duration: 3, repeat: Infinity, ease: "easeInOut" }
+              }}
+              className="bg-gruvbox-bright-blue bg-opacity-20 hover:bg-opacity-30 text-gruvbox-bright-blue border border-gruvbox-bright-blue border-opacity-50 hover:border-opacity-70 px-8 sm:px-12 py-4 sm:py-5 rounded-lg text-xl sm:text-2xl font-mono transition-all duration-200 w-full sm:w-auto"
+            >
+              <span className="text-gruvbox-bright-green">$</span> ./help
+            </motion.button>
+
+            <motion.button
+              onClick={onBrowseCards}
+              whileHover={{ scale: 1.05, rotateY: 5 }}
+              whileTap={{ scale: 0.95 }}
+              initial={{ opacity: 0, x: 50, rotateX: -15 }}
+              animate={{ 
+                opacity: 1, 
+                x: 0, 
+                rotateX: 0,
+                scale: [1, 1.02, 1],
+                rotateY: [0, 2, -2, 0]
+              }}
+              transition={{ 
+                opacity: { delay: 0.4, duration: 0.6, type: "spring", stiffness: 100 },
+                x: { delay: 0.4, duration: 0.6, type: "spring", stiffness: 100 },
+                rotateX: { delay: 0.4, duration: 0.6, type: "spring", stiffness: 100 },
+                scale: { delay: 2, duration: 4, repeat: Infinity, ease: "easeInOut" },
+                rotateY: { delay: 2, duration: 4, repeat: Infinity, ease: "easeInOut" }
+              }}
+              className="bg-gruvbox-bright-purple bg-opacity-20 hover:bg-opacity-30 text-gruvbox-bright-purple border border-gruvbox-bright-purple border-opacity-50 hover:border-opacity-70 px-8 sm:px-12 py-4 sm:py-5 rounded-lg text-xl sm:text-2xl font-mono transition-all duration-200 w-full sm:w-auto"
+            >
+              <span className="text-gruvbox-bright-green">$</span> ./deck
+            </motion.button>
+          </motion.div>
+
+        {/* Dave Thomas Quote - Agile Critic */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="mt-6 mb-4 px-8"
+        >
+          <div className="text-center max-w-4xl mx-auto">
+            <div className="text-gruvbox-bright-red text-base sm:text-lg font-mono italic leading-relaxed">
+              "The word 'agile' has been subverted to the point where it is effectively meaningless, and what passes for an agile community seems to be largely an arena for consultants and vendors to hawk services and products."
+            </div>
+            <div className="text-gruvbox-dark-fg3 text-sm sm:text-base mt-3">
+              — Dave Thomas, <span className="text-gruvbox-bright-yellow">Agile Manifesto Co-Author</span>
+            </div>
           </div>
         </motion.div>
 
-                {/* Start Button */}
-        <motion.button
-          onClick={onStartGame}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+        </motion.div>
+      </div>
+
+      {/* Footer */}
+      <footer className="flex-shrink-0 p-4">
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
-          className="button-primary px-10 py-4 rounded-lg text-xl font-semibold transition-all duration-200"
+          className="text-gruvbox-dark-fg3 text-xs text-center"
         >
-          Begin Your Sprint Journey
-        </motion.button>
+          <span className="text-gruvbox-bright-purple">v2.0.0</span> • Agile Shaman Collective • Sprint Management Survival Satire
+        </motion.div>
+      </footer>
 
-                       {/* Terminal Prompt */}
-               <motion.div
-                 initial={{ opacity: 0 }}
-                 animate={{ opacity: 1 }}
-                 transition={{ delay: 0.8 }}
-                 className="mt-6 text-gruvbox-dark-fg4 text-base"
-               >
-                 <span className="text-gruvbox-bright-green">$</span> ./agile-shaman --mode=survival --difficulty=8-sprints
-               </motion.div>
+      {/* How to Play Modal */}
+      {showHowToPlay && (
+        <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="terminal-card p-8 max-w-4xl mx-auto max-h-[90vh] overflow-y-auto"
+          >
+            <div className="flex justify-between items-center mb-6">
+              <div className="text-gruvbox-bright-aqua text-2xl font-mono">
+                🎮 How to Play
+              </div>
+              <button
+                onClick={() => setShowHowToPlay(false)}
+                className="text-gruvbox-bright-red hover:text-gruvbox-bright-yellow text-2xl font-mono transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="text-gruvbox-dark-fg2 leading-relaxed space-y-4 text-base">
+              <p>
+                <span className="text-gruvbox-bright-yellow text-lg">Your Mission:</span> Guide your development team through 8 challenging sprints to achieve software delivery enlightenment.
+              </p>
+              
+              <p>
+                Balance four critical aspects of software development while navigating the chaos of modern tech teams:
+              </p>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-6">
+                <div className="bg-gruvbox-dark-bg2 p-3 rounded">
+                  <span className="text-gruvbox-bright-blue text-lg">⚡ Velocity</span>
+                  <div className="text-sm text-gruvbox-dark-fg3">Feature delivery speed</div>
+                </div>
+                <div className="bg-gruvbox-dark-bg2 p-3 rounded">
+                  <span className="text-gruvbox-bright-green text-lg">♡ Team Spirit</span>
+                  <div className="text-sm text-gruvbox-dark-fg3">Developer motivation & happiness</div>
+                </div>
+                <div className="bg-gruvbox-dark-bg2 p-3 rounded">
+                  <span className="text-gruvbox-bright-yellow text-lg">★ Client Satisfaction</span>
+                  <div className="text-sm text-gruvbox-dark-fg3">Stakeholder happiness</div>
+                </div>
+                <div className="bg-gruvbox-dark-bg2 p-3 rounded">
+                  <span className="text-gruvbox-bright-red text-lg">⚠ Technical Debt</span>
+                  <div className="text-sm text-gruvbox-dark-fg3">Code quality burden</div>
+                </div>
+              </div>
+              
+              <p>
+                <span className="text-gruvbox-bright-yellow text-lg">How to Play:</span> Each sprint, face 3 scenario cards. Make 2 strategic decisions that will affect your team's destiny. Use bonus rituals wisely - they're limited!
+              </p>
 
-               {/* Cheeky Developer Comment */}
-               <motion.div
-                 initial={{ opacity: 0 }}
-                 animate={{ opacity: 1 }}
-                 transition={{ delay: 0.9 }}
-                 className="mt-2 text-gruvbox-dark-fg4 text-xs text-center italic"
-               >
-                 <span className="text-gruvbox-bright-orange">// TODO:</span> Handle refresh cases properly. Current dev clearly didn't consider this edge case. GG WP! 🤡
-               </motion.div>
-
-               {/* Footer - Author Info */}
-               <motion.div
-                 initial={{ opacity: 0 }}
-                 animate={{ opacity: 1 }}
-                 transition={{ delay: 1.0 }}
-                 className="mt-4 text-gruvbox-dark-fg3 text-sm text-center"
-               >
-                 <span className="text-gruvbox-bright-purple">Version 1.0.0</span> • Created by the Agile Shaman Collective • A satirical journey through sprint management survival
-               </motion.div>
-      </motion.div>
+              <div className="mt-6 pt-4 border-t border-gruvbox-dark-bg3">
+                <p className="text-gruvbox-bright-aqua text-lg mb-2">🎯 Victory Conditions:</p>
+                <p>Survive all 8 sprints while keeping your metrics balanced. Avoid letting any metric drop to zero!</p>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 };

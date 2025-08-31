@@ -10,7 +10,7 @@
 - **Build Tool**: Vite
 - **Styling**: TailwindCSS with Gruvbox color palette  
 - **Animations**: Framer Motion
-- **Font**: Monospace (JetBrains Mono, Fira Code)
+- **Font**: Monospace (Source Code Pro)
 - **State Management**: React Hooks (useState, useCallback)
 
 ## 📁 Project Structure
@@ -27,7 +27,7 @@ src/
 │   ├── ui/              # Reusable UI components (empty)
 │   └── LandingPage.tsx  # Game intro and start screen
 ├── data/                # Game data and configuration
-│   ├── cards.ts         # Card definitions (44 cards total)
+│   ├── cards.ts         # Card definitions (72 cards total)
 │   └── gameConfig.ts    # Game configuration and difficulty levels
 ├── hooks/               # Custom React hooks
 │   └── useGameState.ts  # Main game state management hook
@@ -45,7 +45,7 @@ src/
 1. **Landing Page**: Introduction with lore and game rules
 2. **8 Sprints**: Each sprint presents 3 scenario cards
 3. **2 Actions per Sprint**: Players must choose 2 cards to play
-4. **Bonus Rituals**: Limited special actions (pastries, refactor, coffee)
+4. **Sprint Boost Toolkit**: 10 one-time special actions available throughout game
 5. **Win/Lose Conditions**: Based on stat thresholds
 
 ### Core Stats
@@ -125,10 +125,10 @@ interface Choice {
 }
 ```
 
-### Card Categories (44 Total)
-- **Common Cards (~28)**: Everyday development challenges
-- **Rare Cards (~13)**: Major team/project disruptions  
-- **Legendary Cards (~3)**: Game-changing scenarios
+### Card Categories (72 Total)
+- **Common Cards (~55)**: Everyday development challenges
+- **Rare Cards (~15)**: Major team/project disruptions  
+- **Legendary Cards (~2)**: Game-changing scenarios
 
 ### Card Themes
 - **Social Dynamics**: Team morale, office culture, remote work
@@ -136,6 +136,49 @@ interface Choice {
 - **Business Pressures**: Client demands, budget constraints, deadlines
 - **Industry Trends**: AI adoption, crypto integration, tech hype
 - **Crisis Management**: Production fires, disasters, intern mistakes
+
+## 🧰 Sprint Boost Toolkit System
+
+### Toolkit Overview
+- **10 total items** available throughout the entire game
+- **One-time use** - each can only be consumed once per game
+- **Persistent tracking** via `usedRituals` array in game state
+- **Unlock condition** - must complete card actions first each sprint
+
+### Toolkit Categories
+
+#### **Core Boosts (6 items)**
+- **🥐 ./pastries**: Pure team morale boost
+- **☕ ./coffee**: Velocity + morale combination  
+- **🔧 ./refactor**: Tech debt cleanup (slow)
+- **🎭 ./demo**: Client satisfaction (distraction)
+- **⚡ ./overtime**: High velocity at team cost
+- **💰 ./raise**: Expensive but powerful all-around boost
+
+#### **Advanced Boosts (4 items)**
+- **🎓 ./intern**: Fast but messy (adds tech debt)
+- **🧙 ./consultant**: Expert help (expensive, impressive)
+- **🏗️ ./architect**: Major cleanup (lots of meetings)
+- **🍕 ./pizza**: Universal developer happiness
+
+### Implementation Details
+```typescript
+interface GameState {
+  // ... other fields
+  usedRituals: string[];  // Tracks consumed toolkit items
+}
+
+// Ritual types
+type RitualType = 'pastries' | 'refactor' | 'coffee' | 'demo' | 
+                  'overtime' | 'raise' | 'intern' | 'consultant' | 
+                  'architect' | 'pizza';
+```
+
+### Strategic Considerations
+- **Resource management**: Players must plan usage across 8 sprints
+- **Timing decisions**: When to use powerful boosts vs save them
+- **Risk mitigation**: Emergency items for critical situations
+- **Opportunity cost**: Using limited resources optimally
 
 ## ⚙️ Game Configuration
 
@@ -182,11 +225,11 @@ archShaman: 10 sprints, 2 actions, 35% chaos
 ## 🔄 State Flow
 
 ### Sprint Lifecycle
-1. **Sprint Start**: Draw 3 cards, reset actions/rituals
-2. **Player Actions**: Choose 2 cards (track played cards)
+1. **Sprint Start**: Draw 3 cards (avoid duplicates from entire game)
+2. **Player Actions**: Choose 2 cards (track played cards across all sprints)
 3. **Visual Feedback**: Highlight final card when 1 remains
-4. **Ritual Phase**: Optional bonus actions (if actions completed)
-5. **Sprint End**: Advance sprint, reset counters, check win/lose
+4. **Toolkit Phase**: Optional one-time boosts (if actions completed)
+5. **Sprint End**: Advance sprint, check win/lose (toolkit items remain used)
 6. **Chaos Events**: Random disruptions (25% chance per action)
 
 ### Game End Conditions

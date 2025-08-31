@@ -1,7 +1,8 @@
 # Agile Shaman - Complete Card Deck Summary
 
-## 📊 Card Statistics
-- **Total Cards**: 22 unique scenarios
+## 📊 Game Statistics
+- **Total Cards**: 72 unique scenarios
+- **Toolkit Items**: 10 one-time boosts
 - **Common Cards**: ~70% draw weight
 - **Rare Cards**: ~25% draw weight  
 - **Legendary Cards**: ~5% draw weight
@@ -178,6 +179,62 @@
 
 ---
 
+## 🧰 **Sprint Boost Toolkit (One-Time Use)**
+
+*Each toolkit item can only be used once per game. Choose wisely!*
+
+### **Core Boosts (Original)**
+
+#### 🥐 **./pastries** - Sacred Pastries
+- **Effects**: `+10 team_spirit`
+- **Theme**: Classic developer happiness boost
+
+#### ☕ **./coffee** - Caffeine Boost  
+- **Effects**: `+6 velocity`, `+4 team_spirit`
+- **Theme**: Productivity enhancer with morale benefit
+
+#### 🔧 **./refactor** - Code Cleansing
+- **Effects**: `-10 tech_debt`, `-3 velocity` 
+- **Theme**: Clean up debt but slow current sprint
+
+#### 🎭 **./demo** - Client Demo
+- **Effects**: `+8 client_sat`, `-2 velocity`
+- **Theme**: Impress stakeholders, distract from development
+
+#### ⚡ **./overtime** - Crunch Mode
+- **Effects**: `+12 velocity`, `-6 team_spirit`
+- **Theme**: Push hard for delivery at team cost
+
+#### 💰 **./raise** - Salary Boost
+- **Effects**: `+15 team_spirit`, `+3 velocity`, `+5 client_sat`
+- **Theme**: Expensive but powerful all-around boost
+
+### **Advanced Boosts (New)**
+
+#### 🎓 **./intern** - Junior Developer
+- **Effects**: `+8 velocity`, `+5 tech_debt`, `+3 team_spirit`
+- **Theme**: Fresh energy but creates technical debt
+
+#### 🧙 **./consultant** - External Expert
+- **Effects**: `+5 velocity`, `+12 client_sat`, `-8 tech_debt`
+- **Theme**: Expensive specialist who impresses clients
+
+#### 🏗️ **./architect** - Senior Architect  
+- **Effects**: `-15 tech_debt`, `-5 velocity`, `-3 team_spirit`
+- **Theme**: Major cleanup but lots of meetings
+
+#### 🍕 **./pizza** - Team Pizza Party
+- **Effects**: `+12 team_spirit`, `+4 velocity`, `+6 client_sat`
+- **Theme**: Universal developer happiness generator
+
+### **Toolkit Strategy:**
+- **10 total items** available throughout the entire game
+- **One-time use** - each can only be consumed once
+- **Unlock after cards** - must complete card actions first each sprint
+- **Strategic timing** - save powerful boosts for critical moments
+
+---
+
 ## 🎯 **Game Balance Notes**
 
 ### **Stat Effects Patterns:**
@@ -198,4 +255,4 @@
 - Technical debt accumulates but can be paid down
 - Senior developer knowledge is precious but fragile
 
-This deck provides 22 unique scenarios covering the full spectrum of modern software development challenges! 🚀
+This deck provides 72 unique scenarios plus 10 strategic toolkit items covering the full spectrum of modern software development challenges! 🚀

@@ -17,7 +17,7 @@
   }
   
   .button-primary {
-    @apply bg-gruvbox-light-blue text-gruvbox-dark-bg hover:bg-gruvbox-bright-blue;
+    @apply bg-gruvbox-bright-yellow text-gruvbox-dark-bg0 hover:bg-gruvbox-light-yellow;
   }
   
   .button-secondary {
@@ -90,6 +90,33 @@
   
   .animate-numberDecrement {
     animation: numberDecrement 0.4s ease-out;
+  }
+
+  /* Cool background animations */
+  @keyframes matrixFall {
+    0% { transform: translateY(-100vh); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(100vh); opacity: 0; }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    33% { transform: translateY(-10px) rotate(120deg); }
+    66% { transform: translateY(5px) rotate(240deg); }
+  }
+
+  @keyframes chaosShake {
+    0%, 100% { transform: translateX(0); }
+    10% { transform: translateX(-2px) rotate(-0.5deg); }
+    20% { transform: translateX(2px) rotate(0.5deg); }
+    30% { transform: translateX(-1px) rotate(-0.3deg); }
+    40% { transform: translateX(1px) rotate(0.3deg); }
+    50% { transform: translateX(-2px) rotate(-0.5deg); }
+    60% { transform: translateX(2px) rotate(0.5deg); }
+    70% { transform: translateX(-1px) rotate(-0.2deg); }
+    80% { transform: translateX(1px) rotate(0.2deg); }
+    90% { transform: translateX(-1px) rotate(-0.1deg); }
   }
 }
 

@@ -54,6 +54,7 @@ export interface GameState {
   maxRituals: number;
   cardActionsCompleted: number;
   playedCards: string[]; // Track which cards have been played this sprint
+  usedRituals: string[]; // Track which rituals have been used this sprint
   log: GameLogEntry[];
   gameStatus: 'playing' | 'victory' | 'defeat';
   defeatReason?: string;

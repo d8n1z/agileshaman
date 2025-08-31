@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 // Framer Motion imports removed - not currently used
 import { useGameState } from '../../hooks/useGameState';
+import { PROJECT_QUOTES } from '../../data/quotes';
 
 const STAT_CONFIG = {
   velocity: { key: 'velocity', label: 'velocity', icon: '⚡', color: 'blue' },
@@ -9,61 +10,108 @@ const STAT_CONFIG = {
   techDebt: { key: 'techDebt', label: 'tech_debt', icon: '⚠', color: 'red' }
 };
 
-export const GameBoard: React.FC = () => {
-  const { gameState, numberAnimations, makeChoice, nextSprint, restartGame, performRitual } = useGameState();
 
-  const renderGameStatus = () => {
+
+interface GameBoardProps {
+  onBackToMenu?: () => void;
+}
+
+export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
+  const { gameState, numberAnimations, chaosEffect, makeChoice, nextSprint, restartGame, performRitual } = useGameState();
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
+  const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
+  const [shuffledQuotes, setShuffledQuotes] = useState<typeof PROJECT_QUOTES>([]);
+  const [isQuoteHovered, setIsQuoteHovered] = useState(false);
+
+  // Shuffle quotes on component mount
+  useEffect(() => {
+    const shuffled = [...PROJECT_QUOTES].sort(() => Math.random() - 0.5);
+    setShuffledQuotes(shuffled);
+  }, []);
+
+  // Listen for browser back button exit requests
+  useEffect(() => {
+    const handleExitRequest = () => {
+      setShowExitConfirm(true);
+    };
+
+    window.addEventListener('requestGameExit', handleExitRequest);
+    return () => window.removeEventListener('requestGameExit', handleExitRequest);
+  }, []);
+
+  const handleBackToMenu = () => {
+    // Clear game state and go back to menu
+    localStorage.removeItem('agile-shaman-game-state');
+    restartGame();
+    if (onBackToMenu) {
+      onBackToMenu();
+    }
+  };
+
+  // Rotate quotes every 4 seconds (pause when hovered)
+  useEffect(() => {
+    if (shuffledQuotes.length === 0 || isQuoteHovered) return;
+    
+    const interval = setInterval(() => {
+      setCurrentQuoteIndex((prev) => (prev + 1) % shuffledQuotes.length);
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [shuffledQuotes, isQuoteHovered]);
+
+  const currentQuote = shuffledQuotes[currentQuoteIndex];
+
+  const renderEndGameModal = () => {
     if (gameState.gameStatus === 'victory') {
       return (
-        <div className="terminal-card p-8 text-center">
-          <div className="text-gruvbox-bright-green text-4xl mb-4 font-mono">
-            PROCESS COMPLETED SUCCESSFULLY
-          </div>
-          <div className="text-gruvbox-bright-yellow text-xl mb-4">
-            ./sprint-mastery --achieved --enlightenment=true
-          </div>
-          <p className="text-gruvbox-dark-fg2 mb-6 font-mono">
-            # 10/10 sprints completed. All systems green. ✓
+        <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4">
+          <div className="terminal-card p-8 text-center max-w-lg mx-auto shadow-2xl border-2 border-gruvbox-bright-green border-opacity-50">
+            <div className="text-gruvbox-bright-green text-4xl mb-4 font-mono">
+              PROCESS COMPLETED SUCCESSFULLY
+            </div>
+            <div className="text-gruvbox-bright-yellow text-xl mb-4">
+              $ ./agile-shaman --status=legendary --chaos-survived --8-sprints-conquered
+            </div>
+            <p className="text-gruvbox-dark-fg2 mb-6 font-mono">
+              # {gameState.sprint}/8 sprints completed. All systems green. ✓
           </p>
           <button
             onClick={restartGame}
-            className="button-primary px-6 py-3 rounded font-mono transition-all"
+              className="button-primary px-6 py-3 rounded font-mono transition-all"
           >
-            ./restart-journey
+              ./restart-journey
           </button>
+          </div>
         </div>
       );
     }
 
     if (gameState.gameStatus === 'defeat') {
       return (
-        <div className="terminal-card p-8 text-center">
-          <div className="text-gruvbox-bright-red text-4xl mb-4 font-mono">
-            PROCESS TERMINATED
-          </div>
-          <div className="text-gruvbox-dark-fg2 mb-6 font-mono">
+        <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4">
+          <div className="terminal-card p-8 text-center max-w-lg mx-auto shadow-2xl border-2 border-gruvbox-bright-red border-opacity-50">
+            <div className="text-gruvbox-bright-red text-4xl mb-4 font-mono">
+              PROCESS TERMINATED
+            </div>
+            <div className="text-gruvbox-bright-orange text-lg mb-2 font-mono">
+              Sprint {gameState.sprint} • Exit Code: FAILURE
+            </div>
+            <div className="text-gruvbox-dark-fg2 mb-6 font-mono text-sm bg-gruvbox-dark-bg2 p-3 rounded">
             {gameState.defeatReason}
-          </div>
+            </div>
           <button
             onClick={restartGame}
-            className="button-secondary px-6 py-3 rounded font-mono transition-all"
+              className="button-primary px-6 py-3 rounded font-mono transition-all"
           >
-            ./retry-mission
+              ./retry-mission
           </button>
+          </div>
         </div>
       );
     }
 
     return null;
   };
-
-  if (gameState.gameStatus !== 'playing') {
-    return (
-      <div className="min-h-screen bg-gruvbox-dark-bg0 flex items-center justify-center p-4">
-        {renderGameStatus()}
-      </div>
-    );
-  }
 
   return (
     <div className="h-screen bg-gruvbox-dark-bg0 p-4 font-mono overflow-hidden">
@@ -74,12 +122,21 @@ export const GameBoard: React.FC = () => {
           <div className="grid grid-cols-12 gap-4 items-center">
             
             {/* Left Section - Game Name */}
-            <div className="col-span-3 flex items-center">
-              <span className="text-gruvbox-bright-yellow text-xl font-bold">./agile-shaman</span>
+            <div className="col-span-3 flex items-center gap-3">
+              <button 
+                onClick={() => setShowExitConfirm(true)}
+                className="text-gruvbox-bright-yellow text-xl font-bold hover:text-gruvbox-light-yellow transition-colors duration-200 cursor-pointer hover:underline"
+                title="Back to Main Menu"
+              >
+                ./agile-shaman
+              </button>
+              <span className="text-gruvbox-dark-fg4 text-xs font-mono opacity-60 hover:opacity-100 transition-opacity duration-200">
+                --quit
+              </span>
             </div>
             
             {/* Center Section - Metrics (Wider & More Readable) */}
-            <div className="col-span-6">
+            <div className={`col-span-6 transition-all duration-500 ${chaosEffect ? 'animate-pulse' : ''}`}>
               <div className="grid grid-cols-4 gap-4">
                 {Object.entries(STAT_CONFIG).map(([key, config]) => {
                   const value = gameState.stats[key as keyof typeof gameState.stats];
@@ -98,7 +155,7 @@ export const GameBoard: React.FC = () => {
                   const isDangerous = (key === 'techDebt' && value > 80) || (key !== 'techDebt' && value < 20);
                   
                   return (
-                    <div key={key} className={`flex items-center gap-3 transition-all duration-300 bg-gruvbox-dark-bg2 rounded-lg px-3 py-2 ${isDangerous ? `${colors.glow} shadow-lg animate-pulse` : ''}`}>
+                    <div key={key} className={`flex items-center gap-2 transition-all duration-300 px-2 py-2 ${isDangerous ? `${colors.glow} shadow-lg animate-pulse rounded-lg bg-gruvbox-dark-bg2` : ''} ${chaosEffect ? 'animate-pulse' : ''}`} style={chaosEffect ? { animation: 'chaosShake 0.5s ease-in-out' } : {}}>
                       <span className={`${colors.text} ${isDangerous ? 'animate-pulse' : ''} text-base flex-shrink-0`}>{config.icon}</span>
                       <div className="flex-1 min-w-0">
                         <div className="text-gruvbox-dark-fg2 text-xs font-medium mb-1">{config.label}</div>
@@ -115,8 +172,8 @@ export const GameBoard: React.FC = () => {
                       <div className={`text-base font-black ${colors.text} ${isDangerous ? 'animate-pulse' : ''} flex-shrink-0`}>
                         {value}
                         {isDangerous && <span className="ml-1 text-red-400">⚠</span>}
-                      </div>
-                    </div>
+            </div>
+          </div>
                   );
                 })}
               </div>
@@ -132,25 +189,56 @@ export const GameBoard: React.FC = () => {
                 <span className="text-gruvbox-dark-fg3 text-xs"> of {gameState.maxSprints}</span>
               </div>
             </div>
-            
+
           </div>
         </div>
 
         {/* 3-Column Main Content Area - Full Height */}
-        <div className="flex-1 grid grid-cols-12 gap-4 min-h-0">
+        <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 min-h-0">
           
-          {/* Left Column - Background Image Area */}
-          <div className="col-span-12 lg:col-span-3">
+          {/* Left Column - Background Image Area (Narrower) */}
+          <div className="hidden lg:block lg:col-span-2">
             <div className="h-full w-full rounded relative overflow-hidden border border-gruvbox-dark-bg3 min-h-[600px]">
               {/* Background image */}
               <div className="absolute inset-0 bg-center bg-no-repeat bg-cover bg-[url('/shaman-bg.png')]" />
               {/* Subtle dark overlay for readability */}
               <div className="absolute inset-0 bg-gruvbox-dark-bg0/30" />
+              
+              {/* Rotating Satirical Quotes */}
+              <div className="absolute bottom-4 left-4 right-4">
+                <div 
+                  className="bg-gruvbox-dark-bg0/80 backdrop-blur-sm rounded-lg p-3 pb-6 border border-gruvbox-dark-bg3/50 cursor-pointer hover:bg-gruvbox-dark-bg0/90 transition-all duration-300 relative"
+                  onMouseEnter={() => setIsQuoteHovered(true)}
+                  onMouseLeave={() => setIsQuoteHovered(false)}
+                >
+                  {currentQuote && (
+                    <div 
+                      key={currentQuoteIndex}
+                      className="text-gruvbox-bright-yellow text-xs font-mono italic text-center leading-relaxed mb-2"
+                      style={{
+                        animation: 'fadeInSlide 0.5s ease-in-out'
+                      }}
+                    >
+                      <div>"{currentQuote.quote}"</div>
+                      <div className="text-gruvbox-bright-red mt-1">— {currentQuote.attribution}</div>
+                    </div>
+                  )}
+                  
+                  {/* Terminal-style status indicator */}
+                  <div className="absolute bottom-1 left-2 text-xs font-mono">
+                    {isQuoteHovered ? (
+                      <span className="text-gruvbox-bright-aqua opacity-70">[PAUSED]</span>
+                    ) : (
+                      <span className="text-gruvbox-dark-fg3 opacity-40">[LIVE]</span>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Center Column - Game Content */}
-          <div className="col-span-12 lg:col-span-6 flex flex-col min-w-0">
+          {/* Center Column - Game Content (Wider) */}
+          <div className="col-span-1 lg:col-span-7 flex flex-col min-w-0">
             
             {/* Cards Container with integrated labels */}
             <div className="terminal-card p-4 flex-1 flex flex-col">
@@ -170,7 +258,7 @@ export const GameBoard: React.FC = () => {
                 </span>
               </div>
               
-              <div className={`flex-1 gap-3 min-h-0 overflow-y-auto ${
+                              <div className={`flex-1 gap-3 min-h-0 overflow-y-auto p-2 ${
               gameState.hand.length === 1 
                 ? 'flex justify-center' 
                 : gameState.hand.length === 2
@@ -185,18 +273,25 @@ export const GameBoard: React.FC = () => {
                 const isPostponedToEternity = gameState.hand.length === 1 && gameState.cardActionsCompleted === 2 && isCardDisabled;
                 
                 return (
-                  <div 
-                    key={card.id} 
-                    className={`terminal-card ${gameState.cardActionsCompleted >= 2 ? 'p-3' : 'p-4'} flex flex-col transition-all duration-300 relative ${
-                      isCardDisabled ? 'opacity-60 saturate-50' :
-                      isOnlyCardLeft ? 'ring-2 ring-gruvbox-bright-yellow ring-opacity-60 shadow-lg' :
-                      gameState.actionsLeft > 0 && gameState.cardActionsCompleted === 0 ? 'ring-2 ring-gruvbox-bright-blue ring-opacity-30' :
-                      gameState.actionsLeft > 0 ? 'ring-1 ring-gruvbox-bright-blue ring-opacity-25' : ''
-                    } ${gameState.hand.length === 1 ? 'max-w-md w-full self-start' : ''} ${
-                      !isCardDisabled ? 'hover:shadow-lg cursor-pointer' : ''
-                    }`}
+                                      <div 
+                      key={card.id} 
+                      className={`terminal-card ${gameState.cardActionsCompleted >= 2 ? 'p-2' : 'p-3'} flex flex-col transition-all duration-300 relative rounded-lg shadow-md border-2 min-h-0 m-1 ${
+                        isCardDisabled ? 'opacity-60 saturate-50 border-gruvbox-dark-bg3' :
+                        isOnlyCardLeft ? 'ring-2 ring-gruvbox-bright-yellow ring-opacity-60 shadow-xl border-gruvbox-bright-yellow border-opacity-40' :
+                        gameState.actionsLeft > 0 && gameState.cardActionsCompleted === 0 ? 'ring-2 ring-gruvbox-bright-blue ring-opacity-30 border-gruvbox-bright-blue border-opacity-30' :
+                        gameState.actionsLeft > 0 ? 'ring-1 ring-gruvbox-bright-blue ring-opacity-25 border-gruvbox-dark-bg3' : 'border-gruvbox-dark-bg3'
+                      } ${gameState.hand.length === 1 ? 'max-w-md w-full self-start' : 'h-full'} ${
+                        !isCardDisabled ? 'hover:shadow-xl hover:scale-[1.01] hover:border-gruvbox-bright-aqua hover:border-opacity-50 cursor-pointer transform' : ''
+                      }`}
+                      style={{
+                        background: isCardDisabled 
+                          ? 'linear-gradient(135deg, rgba(40, 40, 40, 0.8), rgba(50, 48, 47, 0.6))'
+                          : 'linear-gradient(135deg, rgba(60, 56, 54, 0.9), rgba(80, 73, 69, 0.7))',
+                        backdropFilter: 'blur(2px)'
+                      }}
                   >
-                    <div className="flex items-center gap-2 mb-3">
+                    {/* Card Header */}
+                    <div className="flex items-center gap-2 mb-3 pb-2 border-b border-gruvbox-dark-bg3 border-opacity-50">
                       <span className="text-2xl">{card.icon}</span>
                       <span className="text-gruvbox-bright-aqua text-base font-semibold">{card.title}</span>
                       {isOnlyCardLeft && !isCardDisabled ? (
@@ -237,12 +332,12 @@ export const GameBoard: React.FC = () => {
                           key={choice.id}
                           onClick={() => makeChoice(card, choice)}
                           disabled={isCardDisabled}
-                          className={`w-full text-left p-3 md:p-4 rounded text-sm transition-all duration-200 relative ${
+                          className={`w-full text-left p-3 md:p-4 rounded text-sm transition-all duration-200 relative border ${
                             isCardDisabled
-                              ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed border border-gruvbox-dark-fg4 border-opacity-30' 
+                              ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed border-gruvbox-dark-fg4 border-opacity-30' 
                               : isOnlyCardLeft
-                              ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg hover:bg-gruvbox-bright-yellow hover:bg-opacity-20 border border-gruvbox-bright-yellow border-opacity-30 hover:shadow-md hover:z-10'
-                              : 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg hover:bg-gruvbox-dark-bg3 hover:shadow-md hover:z-10'
+                              ? 'bg-gruvbox-dark-bg1 text-gruvbox-dark-fg hover:bg-gruvbox-bright-yellow hover:bg-opacity-10 border-gruvbox-bright-yellow border-opacity-30 hover:border-opacity-50 hover:shadow-md hover:z-10'
+                              : 'bg-gruvbox-dark-bg1 text-gruvbox-dark-fg hover:bg-gruvbox-dark-bg2 border-gruvbox-dark-bg3 hover:border-gruvbox-bright-aqua hover:border-opacity-50 hover:shadow-md hover:z-10'
                           }`}
                         >
                           <div className="flex items-center gap-2 mb-2">
@@ -300,23 +395,19 @@ export const GameBoard: React.FC = () => {
                   <div className="terminal-card bg-gruvbox-dark-bg1 border-2 border-gruvbox-bright-purple border-opacity-30 shadow-2xl">
                     <div className="p-3 bg-gruvbox-bright-purple bg-opacity-10">
                       <div className="text-xs text-gruvbox-dark-fg3 mb-3 text-center">
-                        {gameState.ritualsUsed >= gameState.maxRituals 
-                          ? '✅ Sprint boost used - advance to next sprint'
-                          : gameState.cardActionsCompleted === 0
-                          ? '🔒 Complete card actions to unlock sprint boosts'
-                          : gameState.cardActionsCompleted >= 2
-                          ? <span className="text-gruvbox-bright-purple animate-pulse">👉 Choose your sprint enhancement now!</span>
-                          : '🚀 Choose your sprint enhancement wisely...'
+                        {gameState.cardActionsCompleted < 2
+                          ? `🔒 Complete ${2 - gameState.cardActionsCompleted} more card action${2 - gameState.cardActionsCompleted === 1 ? '' : 's'} to unlock toolkit`
+                          : <span className="text-gruvbox-bright-purple">✨ Toolkit ready! Each item can only be used once per game</span>
                         }
                       </div>
                       
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-3">
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 mb-3">
                         {/* Team Boosters */}
                         <button
                           onClick={() => performRitual('pastries')}
-                          disabled={gameState.ritualsUsed >= gameState.maxRituals || gameState.cardActionsCompleted === 0}
+                          disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.includes('pastries')}
                           className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
-                            gameState.ritualsUsed >= gameState.maxRituals || gameState.cardActionsCompleted === 0
+                            gameState.cardActionsCompleted === 0 || gameState.usedRituals.includes('pastries')
                               ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
                               : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
                           }`}
@@ -347,11 +438,11 @@ export const GameBoard: React.FC = () => {
                             <span className="text-gruvbox-bright-blue">+6 vel</span>
                             <span className="text-gruvbox-dark-fg4 mx-1">•</span>
                             <span className="text-gruvbox-bright-green">+4 team</span>
-                          </div>
-                        </button>
-
-                        <button
-                          onClick={() => performRitual('refactor')}
+                    </div>
+                  </button>
+                  
+                  <button
+                    onClick={() => performRitual('refactor')}
                           disabled={gameState.ritualsUsed >= gameState.maxRituals || gameState.cardActionsCompleted === 0}
                           className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
                             gameState.ritualsUsed >= gameState.maxRituals || gameState.cardActionsCompleted === 0
@@ -431,23 +522,112 @@ export const GameBoard: React.FC = () => {
                             <span className="text-gruvbox-bright-yellow">+5 client</span>
                           </div>
                         </button>
-                      </div>
-                      
-                      <div className="flex justify-end pt-3 border-t border-gruvbox-dark-bg3">
+
+                        {/* New Toolkit Items */}
                         <button
-                          onClick={nextSprint}
-                          disabled={gameState.ritualsUsed === 0}
+                          onClick={() => performRitual('intern')}
+                          disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.includes('intern')}
+                          className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
+                            gameState.cardActionsCompleted === 0 || gameState.usedRituals.includes('intern')
+                              ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
+                              : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
+                          }`}
+                        >
+                          <div className="flex items-center gap-1 mb-1">
+                            <span>🎓</span>
+                            <span className="font-semibold text-xs">./intern</span>
+                          </div>
+                          <div className="text-xs">
+                            <span className="text-gruvbox-bright-blue">+8 vel</span>
+                            <span className="text-gruvbox-dark-fg4 mx-1">•</span>
+                            <span className="text-gruvbox-bright-red">+5 debt</span>
+                            <span className="text-gruvbox-dark-fg4 mx-1">•</span>
+                            <span className="text-gruvbox-bright-green">+3 team</span>
+                          </div>
+                        </button>
+
+                        <button
+                          onClick={() => performRitual('consultant')}
+                          disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.includes('consultant')}
+                          className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
+                            gameState.cardActionsCompleted === 0 || gameState.usedRituals.includes('consultant')
+                              ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
+                              : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
+                          }`}
+                        >
+                          <div className="flex items-center gap-1 mb-1">
+                            <span>🧙</span>
+                            <span className="font-semibold text-xs">./consultant</span>
+                          </div>
+                          <div className="text-xs">
+                            <span className="text-gruvbox-bright-blue">+5 vel</span>
+                            <span className="text-gruvbox-dark-fg4 mx-1">•</span>
+                            <span className="text-gruvbox-bright-yellow">+12 client</span>
+                            <span className="text-gruvbox-dark-fg4 mx-1">•</span>
+                            <span className="text-gruvbox-bright-green">-8 debt</span>
+                          </div>
+                        </button>
+
+                        <button
+                          onClick={() => performRitual('architect')}
+                          disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.includes('architect')}
+                          className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
+                            gameState.cardActionsCompleted === 0 || gameState.usedRituals.includes('architect')
+                              ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
+                              : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
+                          }`}
+                        >
+                          <div className="flex items-center gap-1 mb-1">
+                            <span>🏗️</span>
+                            <span className="font-semibold text-xs">./architect</span>
+                          </div>
+                          <div className="text-xs">
+                            <span className="text-gruvbox-bright-green">-15 debt</span>
+                            <span className="text-gruvbox-dark-fg4 mx-1">•</span>
+                            <span className="text-gruvbox-bright-red">-5 vel</span>
+                            <span className="text-gruvbox-dark-fg4 mx-1">•</span>
+                            <span className="text-gruvbox-bright-red">-3 team</span>
+                          </div>
+                        </button>
+
+                        <button
+                          onClick={() => performRitual('pizza')}
+                          disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.includes('pizza')}
+                          className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
+                            gameState.cardActionsCompleted === 0 || gameState.usedRituals.includes('pizza')
+                              ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
+                              : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
+                          }`}
+                        >
+                          <div className="flex items-center gap-1 mb-1">
+                            <span>🍕</span>
+                            <span className="font-semibold text-xs">./pizza</span>
+                      </div>
+                          <div className="text-xs">
+                            <span className="text-gruvbox-bright-green">+12 team</span>
+                            <span className="text-gruvbox-dark-fg4 mx-1">•</span>
+                            <span className="text-gruvbox-bright-blue">+4 vel</span>
+                            <span className="text-gruvbox-dark-fg4 mx-1">•</span>
+                            <span className="text-gruvbox-bright-yellow">+6 client</span>
+                    </div>
+                  </button>
+                </div>
+                
+                      <div className="flex justify-end pt-3 border-t border-gruvbox-dark-bg3">
+                  <button
+                    onClick={nextSprint}
+                          disabled={gameState.cardActionsCompleted < 2}
                           className={`px-4 py-2 rounded font-mono transition-all ${
-                            gameState.ritualsUsed === 0
+                            gameState.cardActionsCompleted < 2
                               ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed'
                               : 'button-primary'
                           }`}
                         >
-                          {gameState.ritualsUsed === 0 ? './use-toolkit-first' : './next-sprint'}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                          {gameState.cardActionsCompleted < 2 ? './complete-actions-first' : './next-sprint'}
+                  </button>
+                </div>
+              </div>
+            </div>
                 </div>
 
                 {/* Drawer Header with Boost Counter */}
@@ -464,44 +644,46 @@ export const GameBoard: React.FC = () => {
                       ? 'bg-gruvbox-bright-purple bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30'
                       : 'bg-gruvbox-dark-bg2'
                   }`}>
-                    <span className="text-gruvbox-dark-fg3 text-xs">boost: </span>
+                    <span className="text-gruvbox-dark-fg3 text-xs">used: </span>
                     <span className={`font-bold text-sm transition-all duration-500 transform ${
-                      gameState.cardActionsCompleted >= 1 && gameState.ritualsUsed < gameState.maxRituals
+                      gameState.cardActionsCompleted >= 1
                         ? 'text-gruvbox-bright-purple'
-                        : gameState.ritualsUsed >= gameState.maxRituals
-                        ? 'text-gruvbox-bright-red'
                         : 'text-gruvbox-dark-fg3'
                     } ${numberAnimations.ritualsAvailable}`}>
-                      {gameState.cardActionsCompleted >= 1 && gameState.ritualsUsed < gameState.maxRituals ? 1 : 0}
+                      {gameState.usedRituals.length}
                     </span>
-                    <span className="text-gruvbox-dark-fg4 text-xs">/{gameState.maxRituals}</span>
+                    <span className="text-gruvbox-dark-fg4 text-xs">/10</span>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+            </div>
 
           {/* Right Column - Event Journal */}
-          <div className="col-span-12 lg:col-span-3">
+          <div className="col-span-1 lg:col-span-3">
             <div className="terminal-card h-full flex flex-col overflow-hidden">
               <div className="flex items-center justify-between p-3 pb-2 border-b border-gruvbox-dark-bg3">
-                <span className="text-gruvbox-bright-yellow text-sm"># event_journal.log</span>
+                <span className="text-gruvbox-bright-yellow text-sm"># agile_journal.log</span>
                 <div className="flex items-center gap-1">
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <div className={`w-2 h-2 rounded-full animate-pulse ${
+                    gameState.actionsLeft > 0
+                      ? 'bg-green-400'
+                      : 'bg-red-400'
+                  }`}></div>
                   <span className="text-gruvbox-dark-fg3 text-xs">LIVE</span>
                 </div>
               </div>
               <div className="flex-1 overflow-hidden p-4 pt-3">
                 <div className="h-full overflow-y-auto" id="journal-container">
-                {gameState.log.length === 0 ? (
+                  {gameState.log.length === 0 ? (
                   <div className="text-gruvbox-dark-fg3 text-center py-8 text-sm">
                     <div className="animate-pulse">// Waiting for events...</div>
-                  </div>
-                ) : (
+                    </div>
+                  ) : (
                   <div className="space-y-3">
                     {gameState.log.slice(0, 10).map((entry, index) => (
-                      <div 
-                        key={entry.id} 
+                        <div
+                          key={entry.id}
                         className={`text-sm transition-all duration-500 ${
                           index === 0 ? 'animate-fadeInSlide border-l-2 border-gruvbox-bright-aqua pl-3 bg-gruvbox-dark-bg2 bg-opacity-50 rounded-r' : ''
                         }`}
@@ -518,18 +700,51 @@ export const GameBoard: React.FC = () => {
                           'text-gruvbox-dark-fg2'
                         }`}>
                           <span className="text-gruvbox-bright-aqua mr-1">&gt;</span>
-                          {entry.message}
+                                {entry.message}
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* End Game Modal */}
+      {renderEndGameModal()}
+
+      {/* Exit Confirmation Dialog */}
+      {showExitConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+          <div className="terminal-card p-6 max-w-md mx-4">
+            <div className="text-center">
+              <div className="text-gruvbox-bright-yellow text-xl font-bold mb-4">
+                🚪 Exit to Main Menu?
+              </div>
+              <div className="text-gruvbox-dark-fg2 mb-6">
+                This will end your current sprint session and clear all progress. Are you sure you want to return to the main menu?
+              </div>
+              <div className="flex gap-3 justify-center">
+                <button
+                  onClick={handleBackToMenu}
+                  className="button-primary px-6 py-3 rounded-lg font-semibold transition-all duration-200"
+                >
+                  Yes, Exit Game
+                </button>
+                <button
+                  onClick={() => setShowExitConfirm(false)}
+                  className="bg-gruvbox-dark-bg2 text-gruvbox-dark-fg hover:bg-gruvbox-dark-bg3 px-6 py-3 rounded-lg font-semibold transition-all duration-200"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

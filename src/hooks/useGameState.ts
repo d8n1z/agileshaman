@@ -18,6 +18,7 @@ const createInitialState = (): GameState => ({
   maxRituals: 1, // 1 ritual per sprint max
   cardActionsCompleted: 0,
   playedCards: [], // Track all played cards across the entire game
+  usedRituals: [], // Track which rituals have been used this sprint
   log: [
     {
       id: generateId(),
@@ -63,6 +64,7 @@ export const useGameState = () => {
     ritualsAvailable: '',
     sprint: ''
   });
+  const [chaosEffect, setChaosEffect] = useState(false);
   const prevValuesRef = useRef({
     actionsLeft: 2,
     ritualsAvailable: 0,
@@ -108,6 +110,14 @@ export const useGameState = () => {
       let newStats = applyEffects(prev.stats, choice.effects);
       const messages: string[] = [];
 
+      // Test chaos effect for any choice with negative velocity (temporary for testing)
+      if (choice.effects.velocity && choice.effects.velocity < -10) {
+        setChaosEffect(true);
+        setTimeout(() => setChaosEffect(false), 4000);
+        messages.push(`🚨 CHAOS EVENT! High-risk decision triggered instability!`);
+        messages.push(`📊 Stat changes: velocity: ${choice.effects.velocity}`);
+      }
+
       // Handle ritual effects (RNG outcomes)
       if (choice.ritual) {
         const roll = Math.random();
@@ -120,9 +130,23 @@ export const useGameState = () => {
             messages.push(`✨ ${choice.ritual.successMessage}`);
           }
         } else {
-          // Failure
+          // Failure - trigger chaos effect
           if (choice.ritual.onFailure) {
             newStats = applyEffects(newStats, choice.ritual.onFailure);
+            setChaosEffect(true);
+            setTimeout(() => setChaosEffect(false), 4000);
+            
+            // Add chaos alarm to log with detailed breakdown
+            const effectsText = Object.entries(choice.ritual.onFailure)
+              .map(([stat, value]) => {
+                const statName = stat === 'morale' ? 'team_spirit' : 
+                                stat === 'happiness' ? 'client_sat' : 
+                                stat === 'techDebt' ? 'tech_debt' : stat;
+                return `${statName}: ${value > 0 ? '+' : ''}${value}`;
+              })
+              .join(', ');
+            messages.push(`🚨 CHAOS EVENT! Ritual backfired!`);
+            messages.push(`📊 Stat changes: ${effectsText}`);
           }
           if (choice.ritual.failureMessage) {
             messages.push(`💀 ${choice.ritual.failureMessage}`);
@@ -151,7 +175,7 @@ export const useGameState = () => {
 
     // Add log entry for the choice
     const effectsText = Object.entries(choice.effects)
-      .filter(([_, value]) => value !== 0)
+      .filter(([, value]) => value !== 0)
       .map(([key, value]) => {
         const sign = value! > 0 ? '+' : '';
         const statName = key.charAt(0).toUpperCase() + key.slice(1);
@@ -192,8 +216,8 @@ export const useGameState = () => {
         sprint: newSprint,
         hand: drawHand(3, prev.playedCards), // Pass played cards to avoid duplicates
         actionsLeft: prev.maxActions,
-        ritualsUsed: 0,
         cardActionsCompleted: 0
+        // Don't reset usedRituals - keep track across entire game
         // Don't reset playedCards - keep track across entire game
       };
     });
@@ -211,15 +235,15 @@ export const useGameState = () => {
     setGameState(createInitialState());
   }, []);
 
-  // Perform sprint boost actions (limited actions)
-  const performRitual = useCallback((ritualType: 'pastries' | 'refactor' | 'coffee' | 'demo' | 'overtime' | 'raise') => {
+  // Perform sprint boost actions (limited to once per game)
+  const performRitual = useCallback((ritualType: 'pastries' | 'refactor' | 'coffee' | 'demo' | 'overtime' | 'raise' | 'intern' | 'consultant' | 'architect' | 'pizza') => {
     if (gameState.gameStatus !== 'playing') return;
-    if (gameState.ritualsUsed >= gameState.maxRituals) {
-      addLogEntry('# ERROR: Sprint boost energy depleted for this sprint', 'system');
-      return;
-    }
     if (gameState.cardActionsCompleted === 0) {
       addLogEntry('# ERROR: Complete card actions first before sprint boosts', 'system');
+      return;
+    }
+    if (gameState.usedRituals.includes(ritualType)) {
+      addLogEntry(`# ERROR: ${ritualType} boost already consumed - each toolkit item can only be used once per game`, 'system');
       return;
     }
 
@@ -251,16 +275,32 @@ export const useGameState = () => {
         effects = { morale: +15, velocity: +3, happiness: +5 };
         message = '> boost: salary_boost.announce() // +15 team_spirit, +3 velocity, +5 client_sat';
         break;
+      case 'intern':
+        effects = { velocity: +8, techDebt: +5, morale: +3 };
+        message = '> boost: junior_dev.hire() // +8 velocity, +5 tech_debt, +3 team_spirit';
+        break;
+      case 'consultant':
+        effects = { velocity: +5, happiness: +12, techDebt: -8 };
+        message = '> boost: external_expert.engage() // +5 velocity, +12 client_sat, -8 tech_debt';
+        break;
+      case 'architect':
+        effects = { techDebt: -15, velocity: -5, morale: -3 };
+        message = '> boost: senior_architect.assign() // -15 tech_debt, -5 velocity, -3 team_spirit';
+        break;
+      case 'pizza':
+        effects = { morale: +12, velocity: +4, happiness: +6 };
+        message = '> boost: team_pizza.deliver() // +12 team_spirit, +4 velocity, +6 client_sat';
+        break;
     }
 
     setGameState(prev => ({
       ...prev,
       stats: applyEffects(prev.stats, effects),
-      ritualsUsed: prev.ritualsUsed + 1
+      usedRituals: [...prev.usedRituals, ritualType]
     }));
 
     addLogEntry(message, 'ritual');
-  }, [gameState.gameStatus, gameState.ritualsUsed, gameState.maxRituals, gameState.cardActionsCompleted, addLogEntry]);
+  }, [gameState.gameStatus, gameState.cardActionsCompleted, gameState.usedRituals, addLogEntry]);
 
   // Initialize hand on first load
   useEffect(() => {
@@ -282,8 +322,8 @@ export const useGameState = () => {
     const prev = prevValuesRef.current;
     const current = gameState;
     
-    // Calculate available rituals
-    const currentRitualsAvailable = current.cardActionsCompleted >= 1 && current.ritualsUsed < current.maxRituals ? 1 : 0;
+    // Calculate available rituals (can use toolkit items)
+    const currentRitualsAvailable = current.cardActionsCompleted >= 1 ? 1 : 0;
     
     // Check for changes and trigger animations
     if (prev.actionsLeft !== current.actionsLeft) {
@@ -326,11 +366,12 @@ export const useGameState = () => {
       ritualsAvailable: currentRitualsAvailable,
       sprint: current.sprint
     };
-  }, [gameState.actionsLeft, gameState.ritualsUsed, gameState.cardActionsCompleted, gameState.sprint]);
+  }, [gameState.actionsLeft, gameState.cardActionsCompleted, gameState.sprint]);
 
   return {
     gameState,
     numberAnimations,
+    chaosEffect,
     makeChoice,
     nextSprint,
     restartGame,
