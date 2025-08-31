@@ -236,7 +236,7 @@ export const useGameState = () => {
   }, []);
 
   // Perform sprint boost actions (limited to once per game)
-  const performRitual = useCallback((ritualType: 'pastries' | 'refactor' | 'coffee' | 'demo' | 'overtime' | 'raise' | 'intern' | 'consultant' | 'architect' | 'pizza') => {
+  const performRitual = useCallback((ritualType: 'pastries' | 'refactor' | 'coffee' | 'demo' | 'overtime' | 'raise' | 'intern' | 'consultant' | 'architect' | 'pizza' | 'inspiration' | 'automation' | 'startup' | 'partnership' | 'mentorship') => {
     if (gameState.gameStatus !== 'playing') return;
     if (gameState.cardActionsCompleted === 0) {
       addLogEntry('# ERROR: Complete card actions first before sprint boosts', 'system');
@@ -290,6 +290,26 @@ export const useGameState = () => {
       case 'pizza':
         effects = { morale: +12, velocity: +4, happiness: +6 };
         message = '> boost: team_pizza.deliver() // +12 team_spirit, +4 velocity, +6 client_sat';
+        break;
+      case 'inspiration':
+        effects = { morale: +10, velocity: +6, happiness: +3 };
+        message = '> boost: team_inspiration.ignite() // +10 team_spirit, +6 velocity, +3 client_sat';
+        break;
+      case 'automation':
+        effects = { techDebt: -12, velocity: +8 };
+        message = '> boost: devops_automation.deploy() // -12 tech_debt, +8 velocity';
+        break;
+      case 'startup':
+        effects = { velocity: +25, morale: -10, techDebt: +15 };
+        message = '> boost: startup_mode.activate() // +25 velocity, -10 team_spirit, +15 tech_debt';
+        break;
+      case 'partnership':
+        effects = { happiness: +15, velocity: +6 };
+        message = '> boost: strategic_partnership.form() // +15 client_sat, +6 velocity';
+        break;
+      case 'mentorship':
+        effects = { morale: +12, techDebt: -6, velocity: -2 };
+        message = '> boost: senior_mentorship.program() // +12 team_spirit, -6 tech_debt, -2 velocity';
         break;
     }
 

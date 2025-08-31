@@ -419,25 +419,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                       </div>
                       
                       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 mb-3">
-                        {/* Team Boosters */}
-                        <button
-                          onClick={() => performRitual('pastries')}
-                          disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.includes('pastries')}
-                          className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
-                            gameState.cardActionsCompleted === 0 || gameState.usedRituals.includes('pastries')
-                              ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
-                              : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
-                          }`}
-                        >
-                          <div className="flex items-center gap-1 mb-1">
-                            <span>🥐</span>
-                            <span className="font-semibold text-xs">./pastries</span>
-                          </div>
-                          <div className="text-xs">
-                            <span className="text-gruvbox-bright-green">+10 team</span>
-                          </div>
-                        </button>
-
+                        {/* VELOCITY & PRODUCTIVITY */}
                         <button
                           onClick={() => performRitual('coffee')}
                           disabled={gameState.ritualsUsed >= gameState.maxRituals || gameState.cardActionsCompleted === 0}
@@ -457,46 +439,6 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                             <span className="text-gruvbox-bright-green">+4 team</span>
                     </div>
                   </button>
-                  
-                  <button
-                    onClick={() => performRitual('refactor')}
-                          disabled={gameState.ritualsUsed >= gameState.maxRituals || gameState.cardActionsCompleted === 0}
-                          className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
-                            gameState.ritualsUsed >= gameState.maxRituals || gameState.cardActionsCompleted === 0
-                              ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
-                              : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
-                          }`}
-                        >
-                          <div className="flex items-center gap-1 mb-1">
-                            <span>🔧</span>
-                            <span className="font-semibold text-xs">./refactor</span>
-                          </div>
-                          <div className="text-xs">
-                            <span className="text-gruvbox-bright-red">-10 debt</span>
-                            <span className="text-gruvbox-dark-fg4 mx-1">•</span>
-                            <span className="text-gruvbox-bright-orange">-3 vel</span>
-                          </div>
-                        </button>
-
-                        <button
-                          onClick={() => performRitual('demo')}
-                          disabled={gameState.ritualsUsed >= gameState.maxRituals || gameState.cardActionsCompleted === 0}
-                          className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
-                            gameState.ritualsUsed >= gameState.maxRituals || gameState.cardActionsCompleted === 0
-                              ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
-                              : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
-                          }`}
-                        >
-                          <div className="flex items-center gap-1 mb-1">
-                            <span>🎭</span>
-                            <span className="font-semibold text-xs">./demo</span>
-                          </div>
-                          <div className="text-xs">
-                            <span className="text-gruvbox-bright-yellow">+8 client</span>
-                            <span className="text-gruvbox-dark-fg4 mx-1">•</span>
-                            <span className="text-gruvbox-bright-orange">-2 vel</span>
-                          </div>
-                        </button>
 
                         <button
                           onClick={() => performRitual('overtime')}
@@ -519,29 +461,6 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                         </button>
 
                         <button
-                          onClick={() => performRitual('raise')}
-                          disabled={gameState.ritualsUsed >= gameState.maxRituals || gameState.cardActionsCompleted === 0}
-                          className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
-                            gameState.ritualsUsed >= gameState.maxRituals || gameState.cardActionsCompleted === 0
-                              ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
-                              : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
-                          }`}
-                        >
-                          <div className="flex items-center gap-1 mb-1">
-                            <span>💰</span>
-                            <span className="font-semibold text-xs">./raise</span>
-                          </div>
-                          <div className="text-xs">
-                            <span className="text-gruvbox-bright-green">+15 team</span>
-                            <span className="text-gruvbox-dark-fg4 mx-1">•</span>
-                            <span className="text-gruvbox-bright-blue">+3 vel</span>
-                            <span className="text-gruvbox-dark-fg4 mx-1">•</span>
-                            <span className="text-gruvbox-bright-yellow">+5 client</span>
-                          </div>
-                        </button>
-
-                        {/* New Toolkit Items */}
-                        <button
                           onClick={() => performRitual('intern')}
                           disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.includes('intern')}
                           className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
@@ -551,7 +470,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                           }`}
                         >
                           <div className="flex items-center gap-1 mb-1">
-                            <span>🎓</span>
+                            <span>👶</span>
                             <span className="font-semibold text-xs">./intern</span>
                           </div>
                           <div className="text-xs">
@@ -564,24 +483,146 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                         </button>
 
                         <button
-                          onClick={() => performRitual('consultant')}
-                          disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.includes('consultant')}
+                          onClick={() => performRitual('automation')}
+                          disabled={gameState.usedRituals.includes('automation')}
                           className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
-                            gameState.cardActionsCompleted === 0 || gameState.usedRituals.includes('consultant')
+                            gameState.usedRituals.includes('automation')
                               ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
                               : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
                           }`}
                         >
                           <div className="flex items-center gap-1 mb-1">
-                            <span>🧙</span>
-                            <span className="font-semibold text-xs">./consultant</span>
+                            <span>🤖</span>
+                            <span className="font-semibold text-xs">./automate</span>
                           </div>
                           <div className="text-xs">
-                            <span className="text-gruvbox-bright-blue">+5 vel</span>
+                            <span className="text-gruvbox-bright-red">-12 debt</span>
                             <span className="text-gruvbox-dark-fg4 mx-1">•</span>
-                            <span className="text-gruvbox-bright-yellow">+12 client</span>
+                            <span className="text-gruvbox-bright-blue">+8 vel</span>
+                          </div>
+                        </button>
+
+                        <button
+                          onClick={() => performRitual('startup')}
+                          disabled={gameState.usedRituals.includes('startup')}
+                          className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
+                            gameState.usedRituals.includes('startup')
+                              ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
+                              : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
+                          }`}
+                        >
+                          <div className="flex items-center gap-1 mb-1">
+                            <span>🚀</span>
+                            <span className="font-semibold text-xs">./startup</span>
+                          </div>
+                          <div className="text-xs">
+                            <span className="text-gruvbox-bright-blue">+25 vel</span>
                             <span className="text-gruvbox-dark-fg4 mx-1">•</span>
-                            <span className="text-gruvbox-bright-green">-8 debt</span>
+                            <span className="text-gruvbox-bright-red">-10 team</span>
+                          </div>
+                        </button>
+
+                        {/* TEAM & MORALE */}
+                        <button
+                          onClick={() => performRitual('pastries')}
+                          disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.includes('pastries')}
+                          className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
+                            gameState.cardActionsCompleted === 0 || gameState.usedRituals.includes('pastries')
+                              ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
+                              : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
+                          }`}
+                        >
+                          <div className="flex items-center gap-1 mb-1">
+                            <span>🥐</span>
+                            <span className="font-semibold text-xs">./pastries</span>
+                          </div>
+                          <div className="text-xs">
+                            <span className="text-gruvbox-bright-green">+10 team</span>
+                          </div>
+                        </button>
+
+                        <button
+                          onClick={() => performRitual('pizza')}
+                          disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.includes('pizza')}
+                          className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
+                            gameState.cardActionsCompleted === 0 || gameState.usedRituals.includes('pizza')
+                              ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
+                              : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
+                          }`}
+                        >
+                          <div className="flex items-center gap-1 mb-1">
+                            <span>🍕</span>
+                            <span className="font-semibold text-xs">./pizza</span>
+                      </div>
+                          <div className="text-xs">
+                            <span className="text-gruvbox-bright-green">+12 team</span>
+                            <span className="text-gruvbox-dark-fg4 mx-1">•</span>
+                            <span className="text-gruvbox-bright-blue">+4 vel</span>
+                            <span className="text-gruvbox-dark-fg4 mx-1">•</span>
+                            <span className="text-gruvbox-bright-yellow">+6 client</span>
+                    </div>
+                  </button>
+
+                        <button
+                          onClick={() => performRitual('inspiration')}
+                          disabled={gameState.usedRituals.includes('inspiration')}
+                          className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
+                            gameState.usedRituals.includes('inspiration')
+                              ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
+                              : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
+                          }`}
+                        >
+                          <div className="flex items-center gap-1 mb-1">
+                            <span>🌟</span>
+                            <span className="font-semibold text-xs">./inspire</span>
+                          </div>
+                          <div className="text-xs">
+                            <span className="text-gruvbox-bright-green">+10 team</span>
+                            <span className="text-gruvbox-dark-fg4 mx-1">•</span>
+                            <span className="text-gruvbox-bright-blue">+6 vel</span>
+                            <span className="text-gruvbox-dark-fg4 mx-1">•</span>
+                            <span className="text-gruvbox-bright-yellow">+3 client</span>
+                          </div>
+                        </button>
+
+                        <button
+                          onClick={() => performRitual('mentorship')}
+                          disabled={gameState.usedRituals.includes('mentorship')}
+                          className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
+                            gameState.usedRituals.includes('mentorship')
+                              ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
+                              : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
+                          }`}
+                        >
+                          <div className="flex items-center gap-1 mb-1">
+                            <span>👨‍🏫</span>
+                            <span className="font-semibold text-xs">./mentor</span>
+                          </div>
+                          <div className="text-xs">
+                            <span className="text-gruvbox-bright-green">+12 team</span>
+                            <span className="text-gruvbox-dark-fg4 mx-1">•</span>
+                            <span className="text-gruvbox-bright-red">-6 debt</span>
+                          </div>
+                        </button>
+
+                        {/* QUALITY & TECH DEBT */}
+                        <button
+                    onClick={() => performRitual('refactor')}
+                          disabled={gameState.ritualsUsed >= gameState.maxRituals || gameState.cardActionsCompleted === 0}
+                          className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
+                            gameState.ritualsUsed >= gameState.maxRituals || gameState.cardActionsCompleted === 0
+                              ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
+                              : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
+                          }`}
+                        >
+                          <div className="flex items-center gap-1 mb-1">
+                            <span>🔧</span>
+                            <span className="font-semibold text-xs">./refactor</span>
+                          </div>
+                          <div className="text-xs">
+                            <span className="text-gruvbox-bright-red">-10 debt</span>
+                            <span className="text-gruvbox-dark-fg4 mx-1">•</span>
+                            <span className="text-gruvbox-bright-orange">-3 vel</span>
                           </div>
                         </button>
 
@@ -607,27 +648,91 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                           </div>
                         </button>
 
+                        {/* BUSINESS & CLIENT */}
                         <button
-                          onClick={() => performRitual('pizza')}
-                          disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.includes('pizza')}
+                          onClick={() => performRitual('demo')}
+                          disabled={gameState.ritualsUsed >= gameState.maxRituals || gameState.cardActionsCompleted === 0}
                           className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
-                            gameState.cardActionsCompleted === 0 || gameState.usedRituals.includes('pizza')
+                            gameState.ritualsUsed >= gameState.maxRituals || gameState.cardActionsCompleted === 0
                               ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
                               : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
                           }`}
                         >
                           <div className="flex items-center gap-1 mb-1">
-                            <span>🍕</span>
-                            <span className="font-semibold text-xs">./pizza</span>
-                      </div>
+                            <span>🎭</span>
+                            <span className="font-semibold text-xs">./demo</span>
+                          </div>
                           <div className="text-xs">
-                            <span className="text-gruvbox-bright-green">+12 team</span>
+                            <span className="text-gruvbox-bright-yellow">+8 client</span>
                             <span className="text-gruvbox-dark-fg4 mx-1">•</span>
-                            <span className="text-gruvbox-bright-blue">+4 vel</span>
+                            <span className="text-gruvbox-bright-orange">-2 vel</span>
+                          </div>
+                        </button>
+
+                        <button
+                          onClick={() => performRitual('partnership')}
+                          disabled={gameState.usedRituals.includes('partnership')}
+                          className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
+                            gameState.usedRituals.includes('partnership')
+                              ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
+                              : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
+                          }`}
+                        >
+                          <div className="flex items-center gap-1 mb-1">
+                            <span>🤝</span>
+                            <span className="font-semibold text-xs">./partner</span>
+                          </div>
+                          <div className="text-xs">
+                            <span className="text-gruvbox-bright-yellow">+15 client</span>
                             <span className="text-gruvbox-dark-fg4 mx-1">•</span>
-                            <span className="text-gruvbox-bright-yellow">+6 client</span>
-                    </div>
-                  </button>
+                            <span className="text-gruvbox-bright-blue">+6 vel</span>
+                          </div>
+                        </button>
+
+                        {/* EXTERNAL HELP */}
+                        <button
+                          onClick={() => performRitual('consultant')}
+                          disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.includes('consultant')}
+                          className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
+                            gameState.cardActionsCompleted === 0 || gameState.usedRituals.includes('consultant')
+                              ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
+                              : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
+                          }`}
+                        >
+                          <div className="flex items-center gap-1 mb-1">
+                            <span>👨‍💼</span>
+                            <span className="font-semibold text-xs">./consult</span>
+                          </div>
+                          <div className="text-xs">
+                            <span className="text-gruvbox-bright-blue">+5 vel</span>
+                            <span className="text-gruvbox-dark-fg4 mx-1">•</span>
+                            <span className="text-gruvbox-bright-yellow">+12 client</span>
+                            <span className="text-gruvbox-dark-fg4 mx-1">•</span>
+                            <span className="text-gruvbox-bright-green">-8 debt</span>
+                          </div>
+                        </button>
+
+                        <button
+                          onClick={() => performRitual('raise')}
+                          disabled={gameState.ritualsUsed >= gameState.maxRituals || gameState.cardActionsCompleted === 0}
+                          className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
+                            gameState.ritualsUsed >= gameState.maxRituals || gameState.cardActionsCompleted === 0
+                              ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
+                              : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
+                          }`}
+                        >
+                          <div className="flex items-center gap-1 mb-1">
+                            <span>💰</span>
+                            <span className="font-semibold text-xs">./raise</span>
+                          </div>
+                          <div className="text-xs">
+                            <span className="text-gruvbox-bright-green">+15 team</span>
+                            <span className="text-gruvbox-dark-fg4 mx-1">•</span>
+                            <span className="text-gruvbox-bright-blue">+3 vel</span>
+                            <span className="text-gruvbox-dark-fg4 mx-1">•</span>
+                            <span className="text-gruvbox-bright-yellow">+5 client</span>
+                          </div>
+                        </button>
                 </div>
                 
                       <div className="flex justify-between items-center pt-3 border-t border-gruvbox-dark-bg3">

@@ -227,8 +227,28 @@
 - **Effects**: `+12 team_spirit`, `+4 velocity`, `+6 client_sat`
 - **Theme**: Universal developer happiness generator
 
+#### 🌟 **./inspire** - Team Inspiration
+- **Effects**: `+10 team_spirit`, `+6 velocity`, `+3 client_sat`
+- **Theme**: Motivational boost that energizes the entire team
+
+#### 🤖 **./automate** - DevOps Automation
+- **Effects**: `-12 tech_debt`, `+8 velocity`
+- **Theme**: Invest in tools that work for you, long-term payoff
+
+#### 🚀 **./startup** - Startup Mode
+- **Effects**: `+25 velocity`, `-10 team_spirit`, `+15 tech_debt`
+- **Theme**: Move fast and break things (literally)
+
+#### 🤝 **./partner** - Strategic Partnership
+- **Effects**: `+15 client_sat`, `+6 velocity`
+- **Theme**: Strategic alliances open new doors
+
+#### 👨‍🏫 **./mentor** - Senior Mentorship
+- **Effects**: `+12 team_spirit`, `-6 tech_debt`, `-2 velocity`
+- **Theme**: Knowledge transfer and team development
+
 ### **Toolkit Strategy:**
-- **10 total items** available throughout the entire game
+- **15 total items** available throughout the entire game
 - **One-time use** - each can only be consumed once
 - **Unlock after cards** - must complete card actions first each sprint
 - **Strategic timing** - save powerful boosts for critical moments
@@ -255,4 +275,4 @@
 - Technical debt accumulates but can be paid down
 - Senior developer knowledge is precious but fragile
 
-This deck provides 72 unique scenarios plus 10 strategic toolkit items covering the full spectrum of modern software development challenges! 🚀
+This deck provides 72 unique scenarios plus 15 strategic toolkit items covering the full spectrum of modern software development challenges! 🚀
