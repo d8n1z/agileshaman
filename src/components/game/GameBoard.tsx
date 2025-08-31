@@ -144,13 +144,6 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
               <span className="text-gruvbox-dark-fg4 text-xs font-mono opacity-60 hover:opacity-100 transition-opacity duration-200">
                 --quit
               </span>
-              <button
-                onClick={() => setShowRestartConfirm(true)}
-                className="text-gruvbox-bright-orange text-xs font-mono bg-gruvbox-dark-bg2 px-2 py-1 rounded ml-2 opacity-75 hover:opacity-100 hover:bg-gruvbox-dark-bg1 transition-all duration-200"
-                title="Restart game (Ctrl+Shift+R)"
-              >
-                🔄 RESTART
-              </button>
               {import.meta.env.DEV && (
                 <span className="text-gruvbox-bright-red text-xs font-mono bg-gruvbox-dark-bg2 px-2 py-1 rounded ml-2 opacity-75 hover:opacity-100 transition-opacity duration-200 animate-pulse"
                       title="Ctrl+Shift+R = Restart Game">
@@ -245,9 +238,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                     >
                       <div>"{currentQuote.quote}"</div>
                       <div className="text-gruvbox-bright-red mt-1">— {currentQuote.attribution}</div>
-                    </div>
-                  )}
-                  
+          </div>
+        )}
+
                   {/* Terminal-style status indicator */}
                   <div className="absolute bottom-1 left-2 text-xs font-mono">
                     {isQuoteHovered ? (
@@ -637,7 +630,15 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                   </button>
                 </div>
                 
-                      <div className="flex justify-end pt-3 border-t border-gruvbox-dark-bg3">
+                      <div className="flex justify-between items-center pt-3 border-t border-gruvbox-dark-bg3">
+                        <button
+                          onClick={() => setShowRestartConfirm(true)}
+                          className="text-gruvbox-bright-orange text-sm font-mono bg-gruvbox-dark-bg2 px-3 py-2 rounded hover:bg-gruvbox-dark-bg1 transition-all duration-200"
+                          title="Restart game (Ctrl+Shift+R)"
+                        >
+                          🔄 ./restart
+                        </button>
+
                   <button
                     onClick={nextSprint}
                           disabled={gameState.cardActionsCompleted < 2}
@@ -725,7 +726,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                         }`}>
                           <span className="text-gruvbox-bright-aqua mr-1">&gt;</span>
                                 {entry.message}
-                        </div>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -779,7 +780,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                 🔄 Restart Game?
               </div>
               <div className="text-gruvbox-dark-fg2 mb-6">
-                This will reset your current progress and start a new game from the beginning. All your sprint data will be lost. Are you sure?
+                Real life doesn't have a restart button, but every great developer knows when to embrace a fresh perspective. Your current sprint data will reset, but the wisdom you've gained remains. Ready for a new journey?
               </div>
               <div className="flex gap-3 justify-center">
                 <button
