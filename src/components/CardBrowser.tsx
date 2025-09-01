@@ -132,7 +132,7 @@ export const CardBrowser: React.FC<CardBrowserProps> = ({ onBack }) => {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
               whileHover={{ scale: 1.02, y: -2 }}
-              className={`terminal-card p-4 cursor-pointer transition-all duration-200 border-2 ${getRarityBg(card.rarity)} hover:shadow-lg`}
+                            className={`terminal-card p-4 cursor-pointer transition-all duration-200 border-2 ${getRarityBg(card.rarity)} hover:shadow-lg`}
               onClick={() => setSelectedCard(card)}
             >
               <div className="flex items-start gap-3 mb-3">
@@ -146,11 +146,11 @@ export const CardBrowser: React.FC<CardBrowserProps> = ({ onBack }) => {
                   </span>
                 </div>
               </div>
-              
+
               <p className="text-gruvbox-dark-fg3 text-xs mb-3 line-clamp-3">
                 {card.scenario}
               </p>
-              
+
               <div className="text-xs text-gruvbox-dark-fg4">
                 {card.choices.length} choices
               </div>

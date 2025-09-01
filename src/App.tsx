@@ -2,12 +2,16 @@ import { useState, useEffect } from 'react';
 import { LandingPage } from './components/LandingPage';
 import { GameBoard } from './components/game/GameBoard';
 import { CardBrowser } from './components/CardBrowser';
+import { MobileNotSupported } from './components/MobileNotSupported';
+import { useMobileDetection } from './hooks/useMobileDetection';
 import './index.css';
 
 type AppState = 'landing' | 'game' | 'cards';
 
 function App() {
   const [currentView, setCurrentView] = useState<AppState>('landing');
+  const [mobileWarningShown, setMobileWarningShown] = useState(false);
+  const { isMobile } = useMobileDetection();
 
   // Handle browser back/forward buttons
   useEffect(() => {
@@ -71,12 +75,18 @@ function App() {
     }
   }, []);
 
+  // Show mobile warning if on mobile and warning hasn't been shown yet
+  if (isMobile && !mobileWarningShown) {
+    return <MobileNotSupported onContinue={() => setMobileWarningShown(true)} />;
+  }
+
   switch (currentView) {
     case 'landing':
       return (
-        <LandingPage 
+        <LandingPage
           onStartGame={() => navigateTo('game')}
           onBrowseCards={() => navigateTo('cards')}
+          isMobilePreview={isMobile && mobileWarningShown}
         />
       );
     case 'game':
@@ -84,7 +94,7 @@ function App() {
     case 'cards':
       return <CardBrowser onBack={() => navigateTo('landing')} />;
     default:
-      return <LandingPage onStartGame={() => navigateTo('game')} onBrowseCards={() => navigateTo('cards')} />;
+      return <LandingPage onStartGame={() => navigateTo('game')} onBrowseCards={() => navigateTo('cards')} isMobilePreview={isMobile && mobileWarningShown} />;
   }
 }
 

@@ -236,7 +236,7 @@ export const useGameState = () => {
   }, []);
 
   // Perform sprint boost actions (limited to once per game)
-  const performRitual = useCallback((ritualType: 'pastries' | 'refactor' | 'coffee' | 'demo' | 'overtime' | 'raise' | 'intern' | 'consultant' | 'architect' | 'pizza' | 'inspiration' | 'automation' | 'startup' | 'partnership' | 'mentorship') => {
+  const performRitual = useCallback((ritualType: 'pastries' | 'refactor' | 'coffee' | 'demo' | 'overtime' | 'bonus' | 'intern' | 'consultant' | 'architect' | 'pizza' | 'inspiration' | 'automation' | 'startup' | 'partnership' | 'mentorship') => {
     if (gameState.gameStatus !== 'playing') return;
     if (gameState.cardActionsCompleted === 0) {
       addLogEntry('# ERROR: Complete card actions first before sprint boosts', 'system');
@@ -271,9 +271,9 @@ export const useGameState = () => {
         effects = { velocity: +12, morale: -6 };
         message = '> boost: crunch_mode.activate() // +12 velocity, -6 team_spirit';
         break;
-      case 'raise':
+      case 'bonus':
         effects = { morale: +15, velocity: +3, happiness: +5 };
-        message = '> boost: salary_boost.announce() // +15 team_spirit, +3 velocity, +5 client_sat';
+        message = '> boost: bonus_time.announce() // +15 team_spirit, +3 velocity, +5 client_sat';
         break;
       case 'intern':
         effects = { velocity: +8, techDebt: +5, morale: +3 };

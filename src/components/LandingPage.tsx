@@ -5,13 +5,15 @@ import { BACKGROUND_QUOTES } from '../data/quotes';
 interface LandingPageProps {
   onStartGame: () => void;
   onBrowseCards: () => void;
+  isMobilePreview?: boolean;
 }
 
 
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onStartGame, onBrowseCards }) => {
+export const LandingPage: React.FC<LandingPageProps> = ({ onStartGame, onBrowseCards, isMobilePreview = false }) => {
   const [floatingQuotes, setFloatingQuotes] = useState<Array<{id: number, text: string, x: number, y: number, delay: number}>>([]);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(false);
 
   // Generate floating quotes - distributed around center with safe radius
   useEffect(() => {
@@ -59,7 +61,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartGame, onBrowseC
         text: quote,
         x,
         y,
-        delay: Math.random() * 40 // 0-40s delay for much more spread
+        delay: Math.random() * 15 // 0-15s delay for quicker starts
       };
     });
     setFloatingQuotes(quotes);
@@ -79,7 +81,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartGame, onBrowseC
       {subtleDotBackground}
       
       {/* Floating Quotes Animation */}
-      {floatingQuotes.map((quote, index) => {
+      {!isMobilePreview && floatingQuotes.map((quote, index) => {
         // Cycle through vibrant Gruvbox colors
         const colors = [
           'text-gruvbox-bright-red',
@@ -101,38 +103,38 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartGame, onBrowseC
               top: `${quote.y}%`,
             }}
             initial={{ opacity: 0 }}
-            animate={{ 
-              opacity: [0, 0.15, 0.4, 0.15, 0],
+                                                animate={{
+              opacity: [0, 0.25, 0.6, 0.25, 0],
             }}
             transition={{
               duration: 6,
               delay: quote.delay,
-              repeat: Infinity,
+              repeat: showHowToPlay || hasInteracted || isMobilePreview ? 0 : Infinity,
               repeatDelay: 8,
               ease: "easeInOut"
             }}
           >
             <motion.span
               animate={{
-                textShadow: [
-                  "0 0 1px currentColor",
-                  "0 0 4px currentColor", 
-                  "0 0 8px currentColor",
-                  "0 0 4px currentColor",
-                  "0 0 1px currentColor"
+                                textShadow: [
+                  "0 0 2px currentColor",
+                  "0 0 5px currentColor",
+                  "0 0 10px currentColor",
+                  "0 0 5px currentColor",
+                  "0 0 2px currentColor"
                 ],
-                filter: [
-                  "brightness(0.8)",
-                  "brightness(1.1)",
-                  "brightness(1.3)", 
-                  "brightness(1.1)",
-                  "brightness(0.8)"
+                                filter: [
+                  "brightness(0.9)",
+                  "brightness(1.2)",
+                  "brightness(1.5)",
+                  "brightness(1.2)",
+                  "brightness(0.9)"
                 ]
               }}
               transition={{
                 duration: 6,
                 delay: quote.delay,
-                repeat: Infinity,
+                repeat: showHowToPlay || hasInteracted || isMobilePreview ? 0 : Infinity,
                 repeatDelay: 8,
                 ease: "easeInOut"
               }}
@@ -149,7 +151,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartGame, onBrowseC
           className="max-w-4xl mx-auto text-center flex flex-col justify-center"
         >
 
-                    {/* Title with Logo */}
+          {/* Title with Logo */}
           <motion.div
             initial={{ scale: 0.8 }}
             animate={{ scale: 1 }}
@@ -175,21 +177,25 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartGame, onBrowseC
 
           {/* Pure and mysterious - no subtitle */}
 
-          {/* Action Buttons */}
-          <motion.div 
+                    {/* Action Buttons */}
+          <motion.div
             className="flex flex-col sm:flex-row gap-4 items-center justify-center mb-8"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.15 }}
           >
             <motion.button
-              onClick={onStartGame}
-              whileHover={{ scale: 1.05, rotateY: 5 }}
-              whileTap={{ scale: 0.95 }}
+              onClick={() => {
+                if (isMobilePreview) return;
+                setHasInteracted(true);
+                onStartGame();
+              }}
+              whileHover={{ scale: isMobilePreview ? 1 : 1.05, rotateY: isMobilePreview ? 0 : 5 }}
+              whileTap={{ scale: isMobilePreview ? 1 : 0.95 }}
               initial={{ opacity: 0, x: -50, rotateX: -15 }}
-              animate={{ 
-                opacity: 1, 
-                x: 0, 
+              animate={{
+                opacity: 1,
+                x: 0,
                 rotateX: 0,
                 y: [0, -3, 0],
                 boxShadow: [
@@ -198,22 +204,26 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartGame, onBrowseC
                   "0 4px 6px rgba(0, 0, 0, 0.1)"
                 ]
               }}
-              transition={{ 
+              transition={{
                 opacity: { delay: 0.2, duration: 0.6, type: "spring", stiffness: 100 },
                 x: { delay: 0.2, duration: 0.6, type: "spring", stiffness: 100 },
                 rotateX: { delay: 0.2, duration: 0.6, type: "spring", stiffness: 100 },
                 y: { delay: 1, duration: 0.8, repeat: Infinity, ease: "easeInOut" },
                 boxShadow: { delay: 1, duration: 0.8, repeat: Infinity, ease: "easeInOut" }
               }}
-              className="bg-gruvbox-bright-yellow bg-opacity-20 hover:bg-opacity-30 text-gruvbox-bright-yellow border border-gruvbox-bright-yellow border-opacity-50 hover:border-opacity-70 px-8 sm:px-12 py-4 sm:py-5 rounded-lg text-xl sm:text-2xl font-mono transition-all duration-200 w-full sm:w-auto"
+              className="bg-gruvbox-bright-yellow bg-opacity-20 hover:bg-opacity-30 text-gruvbox-bright-yellow border border-gruvbox-bright-yellow border-opacity-50 hover:border-opacity-70 px-8 sm:px-12 py-4 sm:py-5 rounded-lg text-xl sm:text-2xl font-mono transition-all duration-200 w-full sm:w-auto cursor-not-allowed opacity-60"
             >
               <span className="text-gruvbox-bright-green">$</span> ./start
             </motion.button>
 
-            <motion.button
-              onClick={() => setShowHowToPlay(true)}
-              whileHover={{ scale: 1.05, rotateY: -5 }}
-              whileTap={{ scale: 0.95 }}
+                        <motion.button
+              onClick={() => {
+                if (isMobilePreview) return;
+                setHasInteracted(true);
+                setShowHowToPlay(true);
+              }}
+              whileHover={{ scale: isMobilePreview ? 1 : 1.05, rotateY: isMobilePreview ? 0 : -5 }}
+              whileTap={{ scale: isMobilePreview ? 1 : 0.95 }}
               initial={{ opacity: 0, y: 50, rotateX: 15 }}
               animate={{
                 opacity: 1,
@@ -227,35 +237,41 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartGame, onBrowseC
                 rotateX: { delay: 0.3, duration: 0.6, type: "spring", stiffness: 100 },
                 rotateZ: { delay: 1.5, duration: 3, repeat: Infinity, ease: "easeInOut" }
               }}
-              className="bg-gruvbox-bright-blue bg-opacity-20 hover:bg-opacity-30 text-gruvbox-bright-blue border border-gruvbox-bright-blue border-opacity-50 hover:border-opacity-70 px-8 sm:px-12 py-4 sm:py-5 rounded-lg text-xl sm:text-2xl font-mono transition-all duration-200 w-full sm:w-auto"
+              className="bg-gruvbox-bright-blue bg-opacity-20 hover:bg-opacity-30 text-gruvbox-bright-blue border border-gruvbox-bright-blue border-opacity-50 hover:border-opacity-70 px-8 sm:px-12 py-4 sm:py-5 rounded-lg text-xl sm:text-2xl font-mono transition-all duration-200 w-full sm:w-auto cursor-not-allowed opacity-60"
             >
               <span className="text-gruvbox-bright-green">$</span> ./help
             </motion.button>
 
             <motion.button
-              onClick={onBrowseCards}
-              whileHover={{ scale: 1.05, rotateY: 5 }}
-              whileTap={{ scale: 0.95 }}
+              onClick={() => {
+                if (isMobilePreview) return;
+                setHasInteracted(true);
+                onBrowseCards();
+              }}
+              whileHover={{ scale: isMobilePreview ? 1 : 1.05, rotateY: isMobilePreview ? 0 : 5 }}
+              whileTap={{ scale: isMobilePreview ? 1 : 0.95 }}
               initial={{ opacity: 0, x: 50, rotateX: -15 }}
-              animate={{ 
-                opacity: 1, 
-                x: 0, 
+              animate={{
+                opacity: 1,
+                x: 0,
                 rotateX: 0,
                 scale: [1, 1.02, 1],
                 rotateY: [0, 2, -2, 0]
               }}
-              transition={{ 
+              transition={{
                 opacity: { delay: 0.4, duration: 0.6, type: "spring", stiffness: 100 },
                 x: { delay: 0.4, duration: 0.6, type: "spring", stiffness: 100 },
                 rotateX: { delay: 0.4, duration: 0.6, type: "spring", stiffness: 100 },
                 scale: { delay: 2, duration: 4, repeat: Infinity, ease: "easeInOut" },
                 rotateY: { delay: 2, duration: 4, repeat: Infinity, ease: "easeInOut" }
               }}
-              className="bg-gruvbox-bright-purple bg-opacity-20 hover:bg-opacity-30 text-gruvbox-bright-purple border border-gruvbox-bright-purple border-opacity-50 hover:border-opacity-70 px-8 sm:px-12 py-4 sm:py-5 rounded-lg text-xl sm:text-2xl font-mono transition-all duration-200 w-full sm:w-auto"
+              className="bg-gruvbox-bright-purple bg-opacity-20 hover:bg-opacity-30 text-gruvbox-bright-purple border border-gruvbox-bright-purple border-opacity-50 hover:border-opacity-70 px-8 sm:px-12 py-4 sm:py-5 rounded-lg text-xl sm:text-2xl font-mono transition-all duration-200 w-full sm:w-auto cursor-not-allowed opacity-60"
             >
               <span className="text-gruvbox-bright-green">$</span> ./deck
             </motion.button>
           </motion.div>
+
+
 
         {/* Dave Thomas Quote - Agile Critic */}
         <motion.div
@@ -289,7 +305,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartGame, onBrowseC
         </motion.div>
       </footer>
 
-      {/* How to Play Modal */}
+            {/* How to Play Modal */}
       {showHowToPlay && (
         <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4">
           <motion.div
@@ -308,16 +324,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartGame, onBrowseC
                 ✕
               </button>
             </div>
-            
+
             <div className="text-gruvbox-dark-fg2 leading-relaxed space-y-4 text-base">
               <p>
                 <span className="text-gruvbox-bright-yellow text-lg">Your Mission:</span> Guide your development team through 8 challenging sprints to achieve software delivery enlightenment.
               </p>
-              
+
               <p>
                 Balance four critical aspects of software development while navigating the chaos of modern tech teams:
               </p>
-              
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-6">
                 <div className="bg-gruvbox-dark-bg2 p-3 rounded">
                   <span className="text-gruvbox-bright-blue text-lg">⚡ Velocity</span>
@@ -336,7 +352,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartGame, onBrowseC
                   <div className="text-sm text-gruvbox-dark-fg3">Code quality burden</div>
                 </div>
               </div>
-              
+
               <p>
                 <span className="text-gruvbox-bright-yellow text-lg">How to Play:</span> Each sprint, face 3 scenario cards. Make 2 strategic decisions that will affect your team's destiny. Use bonus rituals wisely - they're limited!
               </p>

@@ -134,7 +134,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
             
             {/* Left Section - Game Name */}
             <div className="col-span-3 flex items-center gap-3">
-              <button 
+              <button
                 onClick={() => setShowExitConfirm(true)}
                 className="text-gruvbox-bright-yellow text-xl font-bold hover:text-gruvbox-light-yellow transition-colors duration-200 cursor-pointer hover:underline"
                 title="Back to Main Menu"
@@ -145,19 +145,19 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                 --quit
               </span>
               {import.meta.env.DEV && (
-                <span className="text-gruvbox-bright-red text-xs font-mono bg-gruvbox-dark-bg2 px-2 py-1 rounded ml-2 opacity-75 hover:opacity-100 transition-opacity duration-200 animate-pulse"
+                <span className="text-gruvbox-bright-red text-xs font-mono bg-gruvbox-dark-bg2 px-2 py-1 rounded opacity-75 hover:opacity-100 transition-opacity duration-200 animate-pulse"
                       title="Ctrl+Shift+R = Restart Game">
-                  DEV: Ctrl+Shift+R
+                  DEV
                 </span>
               )}
             </div>
-            
+
             {/* Center Section - Metrics (Wider & More Readable) */}
-            <div className={`col-span-6 transition-all duration-500 ${chaosEffect ? 'animate-pulse' : ''}`}>
+            <div className="col-span-6 transition-all duration-500">
               <div className="grid grid-cols-4 gap-4">
                 {Object.entries(STAT_CONFIG).map(([key, config]) => {
                   const value = gameState.stats[key as keyof typeof gameState.stats];
-                  
+
                   // Create gradient-based color system
                   const getStatColor = (val: number, isInverse = false) => {
                     const normalizedValue = isInverse ? 100 - val : val;
@@ -167,19 +167,19 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                     if (normalizedValue >= 20) return { text: 'text-orange-400', bg: 'bg-orange-500', glow: 'shadow-orange-500/30' };
                     return { text: 'text-red-400', bg: 'bg-red-500', glow: 'shadow-red-500/50' };
                   };
-                  
+
                   const colors = getStatColor(value, key === 'techDebt');
                   const isDangerous = (key === 'techDebt' && value > 80) || (key !== 'techDebt' && value < 20);
-                  
+
                   return (
                     <div key={key} className={`flex items-center gap-2 transition-all duration-300 px-2 py-2 ${isDangerous ? `${colors.glow} shadow-lg animate-pulse rounded-lg bg-gruvbox-dark-bg2` : ''} ${chaosEffect ? 'animate-pulse' : ''}`} style={chaosEffect ? { animation: 'chaosShake 0.5s ease-in-out' } : {}}>
                       <span className={`${colors.text} ${isDangerous ? 'animate-pulse' : ''} text-base flex-shrink-0`}>{config.icon}</span>
                       <div className="flex-1 min-w-0">
                         <div className="text-gruvbox-dark-fg2 text-xs font-medium mb-1">{config.label}</div>
                         <div className="bg-gruvbox-dark-bg3 rounded-full h-2 overflow-hidden shadow-inner">
-                          <div 
+                          <div
                             className={`h-full transition-all duration-500 ${colors.bg} ${isDangerous ? 'animate-pulse' : ''}`}
-                            style={{ 
+                            style={{
                               width: `${Math.max(2, value)}%`,
                               boxShadow: isDangerous ? `inset 0 0 10px rgba(255,255,255,0.3)` : 'none'
                             }}
@@ -274,24 +274,24 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                   ) : null}
                 </span>
               </div>
-              
-                              <div className={`flex-1 gap-3 min-h-0 overflow-y-auto p-2 ${
-              gameState.hand.length === 1 
-                ? 'flex justify-center' 
-                : gameState.hand.length === 2
-                ? 'grid grid-cols-1 md:grid-cols-2'
-                : gameState.cardActionsCompleted >= 2
-                ? 'grid grid-cols-1 md:grid-cols-3' // More compact when drawer is open
-                : 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3'
-            }`}>
-              {gameState.hand.map((card) => {
-                const isOnlyCardLeft = gameState.cardActionsCompleted === 2 && gameState.hand.length === 1;
-                const isCardDisabled = gameState.actionsLeft === 0;
-                const isPostponedToEternity = gameState.hand.length === 1 && gameState.cardActionsCompleted === 2 && isCardDisabled;
-                
-                return (
-                                      <div 
-                      key={card.id} 
+
+              <div className={`flex-1 gap-3 min-h-0 overflow-y-auto p-2 ${
+                gameState.hand.length === 1
+                  ? 'flex justify-center'
+                  : gameState.hand.length === 2
+                  ? 'grid grid-cols-1 md:grid-cols-2'
+                  : gameState.cardActionsCompleted >= 2
+                  ? 'grid grid-cols-1 md:grid-cols-3' // More compact when drawer is open
+                  : 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3'
+              }`}>
+                {gameState.hand.map((card) => {
+                  const isOnlyCardLeft = gameState.cardActionsCompleted === 2 && gameState.hand.length === 1;
+                  const isCardDisabled = gameState.actionsLeft === 0;
+                  const isPostponedToEternity = gameState.hand.length === 1 && gameState.cardActionsCompleted === 2 && isCardDisabled;
+
+                  return (
+                    <div
+                      key={card.id}
                       className={`terminal-card ${gameState.cardActionsCompleted >= 2 ? 'p-2' : 'p-3'} flex flex-col transition-all duration-300 relative rounded-lg shadow-md border-2 min-h-0 m-1 ${
                         isCardDisabled ? 'opacity-60 saturate-50 border-gruvbox-dark-bg3' :
                         isOnlyCardLeft ? 'ring-2 ring-gruvbox-bright-yellow ring-opacity-60 shadow-xl border-gruvbox-bright-yellow border-opacity-40' :
@@ -301,101 +301,101 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                         !isCardDisabled ? 'hover:shadow-xl hover:scale-[1.01] hover:border-gruvbox-bright-aqua hover:border-opacity-50 cursor-pointer transform' : ''
                       }`}
                       style={{
-                        background: isCardDisabled 
+                        background: isCardDisabled
                           ? 'linear-gradient(135deg, rgba(40, 40, 40, 0.8), rgba(50, 48, 47, 0.6))'
                           : 'linear-gradient(135deg, rgba(60, 56, 54, 0.9), rgba(80, 73, 69, 0.7))',
                         backdropFilter: 'blur(2px)'
                       }}
-                  >
-                    {/* Card Header */}
-                    <div className="flex items-center gap-2 mb-3 pb-2 border-b border-gruvbox-dark-bg3 border-opacity-50">
-                      <span className="text-2xl">{card.icon}</span>
-                      <span className="text-gruvbox-bright-aqua text-base font-semibold">{card.title}</span>
-                      {isOnlyCardLeft && !isCardDisabled ? (
-                        <span className="text-gruvbox-bright-yellow text-xs bg-gruvbox-dark-bg2 px-2 py-1 rounded ml-auto">
-                          final_card
-                        </span>
-                      ) : isCardDisabled ? (
-                        <span className="text-gruvbox-bright-red text-xs bg-gruvbox-dark-bg2 px-2 py-1 rounded ml-auto border border-gruvbox-bright-red border-opacity-30">
-                          no_actions_left
-                        </span>
-                      ) : null}
-                      {isPostponedToEternity && (
-                        <div className="absolute top-2 right-2 transform rotate-12">
-                          <span className="text-gruvbox-bright-purple text-xs bg-gruvbox-dark-bg1 px-2 py-1 rounded border border-gruvbox-bright-purple border-opacity-50 font-mono shadow-lg">
-                            ∞ ETERNAL
+                    >
+                      {/* Card Header */}
+                      <div className="flex items-center gap-2 mb-3 pb-2 border-b border-gruvbox-dark-bg3 border-opacity-50">
+                        <span className="text-2xl">{card.icon}</span>
+                        <span className="text-gruvbox-bright-aqua text-base font-semibold">{card.title}</span>
+                        {isOnlyCardLeft && !isCardDisabled ? (
+                          <span className="text-gruvbox-bright-yellow text-xs bg-gruvbox-dark-bg2 px-2 py-1 rounded ml-auto">
+                            final_card
                           </span>
+                        ) : isCardDisabled ? (
+                          <span className="text-gruvbox-bright-red text-xs bg-gruvbox-dark-bg2 px-2 py-1 rounded ml-auto border border-gruvbox-bright-red border-opacity-30">
+                            no_actions_left
+                          </span>
+                        ) : null}
+                        {isPostponedToEternity && (
+                          <div className="absolute top-2 right-2 transform rotate-12">
+                            <span className="text-gruvbox-bright-purple text-xs bg-gruvbox-dark-bg1 px-2 py-1 rounded border border-gruvbox-bright-purple border-opacity-50 font-mono shadow-lg">
+                              ∞ ETERNAL
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-gruvbox-dark-fg2 text-sm mb-4 flex-1 leading-relaxed">
+                        {card.scenario}
+                      </p>
+                      {isOnlyCardLeft && !isCardDisabled && (
+                        <div className="mb-3 p-2 bg-gruvbox-dark-bg2 rounded text-xs text-gruvbox-bright-yellow">
+                          💭 This is your final decision for this sprint. Choose wisely, Agile Shaman.
                         </div>
                       )}
-                    </div>
-                    <p className="text-gruvbox-dark-fg2 text-sm mb-4 flex-1 leading-relaxed">
-                      {card.scenario}
-                    </p>
-                    {isOnlyCardLeft && !isCardDisabled && (
-                      <div className="mb-3 p-2 bg-gruvbox-dark-bg2 rounded text-xs text-gruvbox-bright-yellow">
-                        💭 This is your final decision for this sprint. Choose wisely, Agile Shaman.
-                      </div>
-                    )}
-                    {isCardDisabled && !isPostponedToEternity && (
-                      <div className="mb-3 p-2 bg-gruvbox-dark-bg2 rounded text-xs border border-gruvbox-bright-red border-opacity-20">
-                        <div className="text-gruvbox-bright-red">
-                          🚫 No actions remaining. Use bonus rituals or advance to next sprint.
+                      {isCardDisabled && !isPostponedToEternity && (
+                        <div className="mb-3 p-2 bg-gruvbox-dark-bg2 rounded text-xs border border-gruvbox-bright-red border-opacity-20">
+                          <div className="text-gruvbox-bright-red">
+                            🚫 No actions remaining. Use bonus rituals or advance to next sprint.
+                          </div>
                         </div>
+                      )}
+                      <div className="space-y-3">
+                        {card.choices.map((choice, choiceIndex) => (
+                          <button
+                            key={choice.id}
+                            onClick={() => makeChoice(card, choice)}
+                            disabled={isCardDisabled}
+                            className={`w-full text-left p-3 md:p-4 rounded text-sm transition-all duration-200 relative border ${
+                              isCardDisabled
+                                ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed border-gruvbox-dark-fg4 border-opacity-30'
+                                : isOnlyCardLeft
+                                ? 'bg-gruvbox-dark-bg1 text-gruvbox-dark-fg hover:bg-gruvbox-bright-yellow hover:bg-opacity-10 border-gruvbox-bright-yellow border-opacity-30 hover:border-opacity-50 hover:shadow-md hover:z-10'
+                                : 'bg-gruvbox-dark-bg1 text-gruvbox-dark-fg hover:bg-gruvbox-dark-bg2 border-gruvbox-dark-bg3 hover:border-gruvbox-bright-aqua hover:border-opacity-50 hover:shadow-md hover:z-10'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className={`font-bold ${isCardDisabled ? 'text-gruvbox-dark-fg4' : 'text-gruvbox-bright-yellow'}`}>
+                                {String.fromCharCode(97 + choiceIndex)})
+                              </span>
+                              <span className="font-medium">{choice.label}</span>
+                            </div>
+                            <div className="flex flex-wrap gap-1">
+                              {Object.entries(choice.effects).map(([key, value]) => {
+                                const statNames = {
+                                  velocity: 'vel',
+                                  morale: 'team',
+                                  happiness: 'client',
+                                  techDebt: 'debt'
+                                };
+                                const statName = statNames[key as keyof typeof statNames] || key;
+                                // For tech debt, positive is bad (red), negative is good (green)
+                                const isGoodEffect = key === 'techDebt' ? value! < 0 : value! > 0;
+                                const isBadEffect = key === 'techDebt' ? value! > 0 : value! < 0;
+                                return (
+                                  <span
+                                    key={key}
+                                    className={`text-xs px-2 py-1 rounded font-mono font-semibold ${
+                                      isCardDisabled ? 'bg-gruvbox-dark-bg3 text-gruvbox-dark-fg4 opacity-60' :
+                                      isGoodEffect ? 'bg-gruvbox-light-green text-gruvbox-dark-bg' :
+                                      isBadEffect ? 'bg-gruvbox-light-red text-gruvbox-dark-bg' :
+                                      'bg-gruvbox-dark-bg3 text-gruvbox-dark-fg3'
+                                    }`}
+                                  >
+                                    {value! > 0 ? '+' : ''}{value} {statName}
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          </button>
+                        ))}
                       </div>
-                    )}
-                    <div className="space-y-3">
-                      {card.choices.map((choice, choiceIndex) => (
-                        <button
-                          key={choice.id}
-                          onClick={() => makeChoice(card, choice)}
-                          disabled={isCardDisabled}
-                          className={`w-full text-left p-3 md:p-4 rounded text-sm transition-all duration-200 relative border ${
-                            isCardDisabled
-                              ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed border-gruvbox-dark-fg4 border-opacity-30' 
-                              : isOnlyCardLeft
-                              ? 'bg-gruvbox-dark-bg1 text-gruvbox-dark-fg hover:bg-gruvbox-bright-yellow hover:bg-opacity-10 border-gruvbox-bright-yellow border-opacity-30 hover:border-opacity-50 hover:shadow-md hover:z-10'
-                              : 'bg-gruvbox-dark-bg1 text-gruvbox-dark-fg hover:bg-gruvbox-dark-bg2 border-gruvbox-dark-bg3 hover:border-gruvbox-bright-aqua hover:border-opacity-50 hover:shadow-md hover:z-10'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className={`font-bold ${isCardDisabled ? 'text-gruvbox-dark-fg4' : 'text-gruvbox-bright-yellow'}`}>
-                              {String.fromCharCode(97 + choiceIndex)})
-                            </span>
-                            <span className="font-medium">{choice.label}</span>
-                          </div>
-                          <div className="flex flex-wrap gap-1">
-                            {Object.entries(choice.effects).map(([key, value]) => {
-                              const statNames = {
-                                velocity: 'vel',
-                                morale: 'team', 
-                                happiness: 'client',
-                                techDebt: 'debt'
-                              };
-                              const statName = statNames[key as keyof typeof statNames] || key;
-                              // For tech debt, positive is bad (red), negative is good (green)
-                              const isGoodEffect = key === 'techDebt' ? value! < 0 : value! > 0;
-                              const isBadEffect = key === 'techDebt' ? value! > 0 : value! < 0;
-                              return (
-                                <span 
-                                  key={key}
-                                  className={`text-xs px-2 py-1 rounded font-mono font-semibold ${
-                                    isCardDisabled ? 'bg-gruvbox-dark-bg3 text-gruvbox-dark-fg4 opacity-60' :
-                                    isGoodEffect ? 'bg-gruvbox-light-green text-gruvbox-dark-bg' : 
-                                    isBadEffect ? 'bg-gruvbox-light-red text-gruvbox-dark-bg' :
-                                    'bg-gruvbox-dark-bg3 text-gruvbox-dark-fg3'
-                                  }`}
-                                >
-                                  {value! > 0 ? '+' : ''}{value} {statName}
-                                </span>
-                              );
-                            })}
-                          </div>
-                        </button>
-                      ))}
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
               </div>
             </div>
 
@@ -418,7 +418,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                         }
                       </div>
                       
-                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 mb-3">
+                      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-2 mb-3">
                         {/* VELOCITY & PRODUCTIVITY */}
                         <button
                           onClick={() => performRitual('coffee')}
@@ -713,17 +713,17 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                         </button>
 
                         <button
-                          onClick={() => performRitual('raise')}
-                          disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('raise')}
+                          onClick={() => performRitual('bonus')}
+                          disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('bonus')}
                           className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
-                            gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('raise')
+                            gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('bonus')
                               ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
                               : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
                           }`}
                         >
                           <div className="flex items-center gap-1 mb-1">
                             <span>💰</span>
-                            <span className="font-semibold text-xs">./raise</span>
+                            <span className="font-semibold text-xs">./bonus</span>
                       </div>
                           <div className="text-xs">
                             <span className="text-gruvbox-bright-green">+15 team</span>
