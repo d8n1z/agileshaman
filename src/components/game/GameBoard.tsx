@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 // Framer Motion imports removed - not currently used
 import { useGameState } from '../../hooks/useGameState';
+import { Tooltip } from '../ui/Tooltip';
 import { PROJECT_QUOTES } from '../../data/quotes';
 
 const STAT_CONFIG = {
-  velocity: { key: 'velocity', label: 'velocity', icon: '⚡', color: 'blue' },
-  morale: { key: 'morale', label: 'team_spirit', icon: '♡', color: 'green' },
-  happiness: { key: 'happiness', label: 'client_sat', icon: '★', color: 'yellow' },
-  techDebt: { key: 'techDebt', label: 'tech_debt', icon: '⚠', color: 'red' }
+  velocity: { key: 'velocity', label: 'VL', shortLabel: 'VL', fullName: 'Velocity', description: 'Development speed and delivery rate', icon: '⚡', color: 'blue', colorClass: 'text-blue-400' },
+  morale: { key: 'morale', label: 'TM', shortLabel: 'TM', fullName: 'TeamMorale', description: 'Team spirit and motivation levels', icon: '♡', color: 'green', colorClass: 'text-green-400' },
+  happiness: { key: 'happiness', label: 'CS', shortLabel: 'CS', fullName: 'ClientSat', description: 'Client satisfaction and feedback', icon: '★', color: 'yellow', colorClass: 'text-yellow-400' },
+  techDebt: { key: 'techDebt', label: 'TD', shortLabel: 'TD', fullName: 'TechDebt', description: 'Technical debt and code quality', icon: '⚠', color: 'red', colorClass: 'text-red-400' }
 };
 
 
@@ -18,6 +19,20 @@ interface GameBoardProps {
 
 export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
   const { gameState, numberAnimations, chaosEffect, makeChoice, nextSprint, restartGame, performRitual } = useGameState();
+
+  // Helper function to render metric effects with unified formatting
+  const renderMetricEffect = (value: number, metricKey: string) => {
+    const config = STAT_CONFIG[metricKey as keyof typeof STAT_CONFIG];
+    const shortLabel = config ? config.shortLabel : metricKey;
+    const colorClass = 'text-white'; // Use white for all metric effects
+    return (
+      <span className={colorClass}>
+        {value > 0 ? '+' : ''}{value} {shortLabel}
+      </span>
+    );
+  };
+
+
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [showRestartConfirm, setShowRestartConfirm] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
@@ -81,7 +96,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
               PROCESS COMPLETED SUCCESSFULLY
             </div>
             <div className="text-gruvbox-bright-yellow text-xl mb-4">
-              $ ./agile-shaman --status=legendary --chaos-survived --8-sprints-conquered
+              $ ./agile-shaman --status=legendary --chaos-survived --sprints=8
             </div>
             <p className="text-gruvbox-dark-fg2 mb-6 font-mono">
               # {gameState.sprint}/8 sprints completed. All systems green. ✓
@@ -210,15 +225,15 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
   };
 
   return (
-    <div className="h-screen bg-gruvbox-dark-bg0 p-4 font-mono overflow-hidden" style={{ height: '100dvh' }}>
-      <div className="h-full flex flex-col">
+    <div className="game-container bg-gruvbox-dark-bg0 p-4 font-mono">
+      <div className="h-full flex flex-col min-h-0">
         
         {/* Header - Sprint Info with Metrics in Center */}
-        <div className="terminal-card p-4 mb-4 flex-shrink-0">
-          <div className="grid grid-cols-12 gap-4 items-center">
+        <div className="terminal-card p-3 md:p-4 mb-4 flex-shrink-0 overflow-visible">
+          <div className="grid grid-cols-12 gap-2 md:gap-4 items-center">
             
             {/* Left Section - Game Name */}
-            <div className="col-span-3 flex items-center gap-3">
+            <div className="col-span-4 md:col-span-3 flex items-center gap-2 md:gap-3">
               <button
                 onClick={() => setShowExitConfirm(true)}
                 className="text-gruvbox-bright-yellow text-xl font-bold hover:text-gruvbox-light-yellow transition-colors duration-200 cursor-pointer hover:underline"
@@ -238,51 +253,92 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
             </div>
 
             {/* Center Section - Metrics (Wider & More Readable) */}
-            <div className="col-span-6 transition-all duration-500">
-              <div className="grid grid-cols-4 gap-4">
+            <div className="col-span-4 md:col-span-6 transition-all duration-500 overflow-visible">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 overflow-visible">
                 {Object.entries(STAT_CONFIG).map(([key, config]) => {
                   const value = gameState.stats[key as keyof typeof gameState.stats];
 
-                  // Create gradient-based color system
-                  const getStatColor = (val: number, isInverse = false) => {
+                  // Get semantic colors based on value meaning (green = good, red = bad)
+                  const getSemanticColor = (val: number, metricKey: string) => {
+                    const isInverse = metricKey === 'techDebt';
                     const normalizedValue = isInverse ? 100 - val : val;
-                    if (normalizedValue >= 80) return { text: 'text-green-400', bg: 'bg-green-500', glow: 'shadow-green-500/50' };
-                    if (normalizedValue >= 60) return { text: 'text-green-300', bg: 'bg-green-400', glow: 'shadow-green-400/30' };
-                    if (normalizedValue >= 40) return { text: 'text-yellow-400', bg: 'bg-yellow-500', glow: 'shadow-yellow-500/30' };
-                    if (normalizedValue >= 20) return { text: 'text-orange-400', bg: 'bg-orange-500', glow: 'shadow-orange-500/30' };
-                    return { text: 'text-red-400', bg: 'bg-red-500', glow: 'shadow-red-500/50' };
+                    
+                    // Semantic color mapping: green = good, red = bad
+                    if (normalizedValue >= 80) return { text: 'text-green-400', bg: 'bg-green-500', border: 'border-green-400', glow: 'shadow-green-500/50' };
+                    if (normalizedValue >= 60) return { text: 'text-green-300', bg: 'bg-green-400', border: 'border-green-300', glow: 'shadow-green-400/50' };
+                    if (normalizedValue >= 40) return { text: 'text-yellow-400', bg: 'bg-yellow-500', border: 'border-yellow-400', glow: 'shadow-yellow-500/50' };
+                    if (normalizedValue >= 20) return { text: 'text-orange-400', bg: 'bg-orange-500', border: 'border-orange-400', glow: 'shadow-orange-500/50' };
+                    return { text: 'text-red-400', bg: 'bg-red-500', border: 'border-red-400', glow: 'shadow-red-500/50' };
                   };
 
-                  const colors = getStatColor(value, key === 'techDebt');
+                  // Clean white colors for all metrics
+                  const getMetricAccentColor = (metricKey: string) => {
+                    const accentColors = {
+                      velocity: { text: 'text-white', border: 'border-white' },
+                      morale: { text: 'text-white', border: 'border-white' }, 
+                      happiness: { text: 'text-white', border: 'border-white' },
+                      techDebt: { text: 'text-white', border: 'border-white' }
+                    };
+                    return accentColors[metricKey as keyof typeof accentColors];
+                  };
+
+                  const semanticColors = getSemanticColor(value, key);
+                  const accentColor = getMetricAccentColor(key);
                   const isDangerous = (key === 'techDebt' && value > 80) || (key !== 'techDebt' && value < 20);
 
                   return (
-                    <div key={key} className={`flex items-center gap-2 transition-all duration-300 px-2 py-2 ${isDangerous ? `${colors.glow} shadow-lg animate-pulse rounded-lg bg-gruvbox-dark-bg2` : ''} ${chaosEffect ? 'animate-pulse' : ''}`} style={chaosEffect ? { animation: 'chaosShake 0.5s ease-in-out' } : {}}>
-                      <span className={`${colors.text} ${isDangerous ? 'animate-pulse' : ''} text-base flex-shrink-0`}>{config.icon}</span>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-gruvbox-dark-fg2 text-xs font-medium mb-1">{config.label}</div>
-                        <div className="bg-gruvbox-dark-bg3 rounded-full h-2 overflow-hidden shadow-inner">
+                    <Tooltip
+                      key={key}
+                      content={`${config.fullName}: ${config.description}`}
+                      position="bottom"
+                      delay={300}
+                    >
+                      <div
+                        className={`group flex flex-col items-center gap-1.5 transition-all duration-300 px-3 py-2.5 rounded-lg border-2 ${accentColor.border} ${isDangerous ? `${semanticColors.glow} shadow-lg animate-pulse bg-gruvbox-dark-bg2 border-opacity-60` : 'border-opacity-30 hover:border-opacity-60 hover:bg-gruvbox-dark-bg1 active:scale-95'} ${chaosEffect ? 'animate-pulse' : ''} cursor-pointer focus:outline-none focus:ring-2 focus:ring-gruvbox-bright-blue focus:ring-opacity-50`} 
+                        style={chaosEffect ? { animation: 'chaosShake 0.5s ease-in-out' } : {}}
+                        onClick={() => {
+                          // Add click feedback - could be used for future features like detailed metric view
+                          console.log(`Clicked on ${config.fullName}: ${value}`);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            console.log(`Clicked on ${config.fullName}: ${value}`);
+                          }
+                        }}
+                        tabIndex={0}
+                        role="button"
+                        aria-label={`${config.fullName}: ${value} - ${config.description}`}
+                      >
+                        {/* Progress bar on top - only show on large screens */}
+                        <div className="w-full bg-gruvbox-dark-bg3 rounded-full h-1.5 overflow-hidden shadow-inner border border-gruvbox-dark-bg2 hidden xl:block">
                           <div
-                            className={`h-full transition-all duration-500 ${colors.bg} ${isDangerous ? 'animate-pulse' : ''}`}
+                            className={`h-full transition-all duration-500 ${semanticColors.bg} ${isDangerous ? 'animate-pulse' : ''}`}
                             style={{
                               width: `${Math.max(2, value)}%`,
-                              boxShadow: isDangerous ? `inset 0 0 10px rgba(255,255,255,0.3)` : 'none'
+                              boxShadow: isDangerous ? `inset 0 0 8px rgba(255,255,255,0.2)` : 'none'
                             }}
                           />
                         </div>
+                        
+                        {/* Icon, initials, and number - bigger when no bars */}
+                        <div className="flex items-center gap-2">
+                          <span className={`${accentColor.text} ${isDangerous ? 'animate-pulse' : ''} text-base xl:text-lg`}>{config.icon}</span>
+                          <span className={`${accentColor.text} text-xs xl:text-sm font-bold tracking-wide`}>{config.shortLabel}</span>
+                          <span className={`text-sm xl:text-base font-black ${semanticColors.text} ${isDangerous ? 'animate-pulse' : ''}`}>
+                            {value}
+                            {isDangerous && <span className="ml-1 text-red-400 text-xs">⚠</span>}
+                          </span>
+                        </div>
                       </div>
-                      <div className={`text-base font-black ${colors.text} ${isDangerous ? 'animate-pulse' : ''} flex-shrink-0`}>
-                        {value}
-                        {isDangerous && <span className="ml-1 text-red-400">⚠</span>}
-            </div>
-          </div>
+                    </Tooltip>
                   );
                 })}
               </div>
             </div>
             
             {/* Right Section - Sprint Info */}
-            <div className="col-span-3 flex justify-end">
+            <div className="col-span-4 md:col-span-3 flex justify-end">
               <div className="bg-gruvbox-dark-bg2 px-4 py-2 rounded text-center">
                 <span className="text-gruvbox-dark-fg3 text-xs">sprint </span>
                 <span className={`text-gruvbox-bright-aqua font-bold text-lg transition-all duration-300 transform hover:scale-110 ${numberAnimations.sprint}`}>
@@ -296,7 +352,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
         </div>
 
         {/* 3-Column Main Content Area - Full Height */}
-        <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 min-h-0">
+        <div className="game-content grid grid-cols-1 lg:grid-cols-12 gap-4">
           
           {/* Left Column - Background Image Area (Narrower) */}
           <div className="hidden lg:block lg:col-span-2">
@@ -332,10 +388,10 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
           </div>
 
           {/* Center Column - Game Content (Wider) */}
-          <div className="col-span-1 lg:col-span-7 flex flex-col min-h-0">
+          <div className="col-span-1 lg:col-span-7 flex flex-col min-h-0 overflow-hidden">
             
             {/* Cards Container with integrated labels */}
-            <div className="terminal-card p-4 flex-1 flex flex-col min-h-0">
+            <div className="terminal-card p-4 flex-1 flex flex-col min-h-0 overflow-hidden">
               {/* Header inside card container */}
               <div className="flex items-center justify-between mb-4 pb-2 border-b border-gruvbox-dark-bg3">
                 <span className="text-gruvbox-bright-yellow font-semibold"># scenario_cards.active()</span>
@@ -352,14 +408,20 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                 </span>
               </div>
 
-              <div className={`flex-1 gap-3 min-h-0 overflow-y-auto p-2 ${
+              {gameState.hand.length === 0 && (
+                <div className="col-span-full text-center py-8">
+                  <div className="text-gruvbox-dark-fg3 text-lg mb-4">Loading cards...</div>
+                  <div className="text-gruvbox-dark-fg4 text-sm">Drawing from the mystical deck...</div>
+                </div>
+              )}
+              <div className={`scrollable-content flex-1 gap-3 p-2 ${
                 gameState.hand.length === 1
                   ? 'flex justify-center'
                   : gameState.hand.length === 2
                   ? 'grid grid-cols-1 md:grid-cols-2'
                   : gameState.cardActionsCompleted >= 2
-                  ? 'grid grid-cols-1 md:grid-cols-3' // More compact when drawer is open
-                  : 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3'
+                  ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 card-grid' // More compact when drawer is open
+                  : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 card-grid'
               }`}>
                 {gameState.hand.map((card) => {
                   const isOnlyCardLeft = gameState.cardActionsCompleted === 2 && gameState.hand.length === 1;
@@ -369,12 +431,12 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                   return (
                     <div
                       key={card.id}
-                      className={`terminal-card ${gameState.cardActionsCompleted >= 2 ? 'p-2' : 'p-3'} flex flex-col transition-all duration-300 relative rounded-lg shadow-md border-2 min-h-0 m-1 ${
+                      className={`terminal-card game-card ${gameState.cardActionsCompleted >= 2 ? 'p-2' : 'p-2 md:p-3'} flex flex-col transition-all duration-300 relative rounded-lg shadow-md border-2 m-1 ${
                         isCardDisabled ? 'opacity-60 saturate-50 border-gruvbox-dark-bg3' :
                         isOnlyCardLeft ? 'ring-2 ring-gruvbox-bright-yellow ring-opacity-60 shadow-xl border-gruvbox-bright-yellow border-opacity-40' :
                         gameState.actionsLeft > 0 && gameState.cardActionsCompleted === 0 ? 'ring-2 ring-gruvbox-bright-blue ring-opacity-30 border-gruvbox-bright-blue border-opacity-30' :
                         gameState.actionsLeft > 0 ? 'ring-1 ring-gruvbox-bright-blue ring-opacity-25 border-gruvbox-dark-bg3' : 'border-gruvbox-dark-bg3'
-                      } ${gameState.hand.length === 1 ? 'max-w-md w-full self-start' : 'h-full'} ${
+                      } ${gameState.hand.length === 1 ? 'max-w-md w-full self-start' : ''} ${
                         !isCardDisabled ? 'hover:shadow-xl hover:scale-[1.01] hover:border-gruvbox-bright-aqua hover:border-opacity-50 cursor-pointer transform' : ''
                       }`}
                       style={{
@@ -405,28 +467,29 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                           </div>
                         )}
                       </div>
-                      <p className="text-gruvbox-dark-fg2 text-sm mb-4 flex-1 leading-relaxed">
-                        {card.scenario}
-                      </p>
-                      {isOnlyCardLeft && !isCardDisabled && (
-                        <div className="mb-3 p-2 bg-gruvbox-dark-bg2 rounded text-xs text-gruvbox-bright-yellow">
-                          💭 This is your final decision for this sprint. Choose wisely, Agile Shaman.
-                        </div>
-                      )}
-                      {isCardDisabled && !isPostponedToEternity && (
-                        <div className="mb-3 p-2 bg-gruvbox-dark-bg2 rounded text-xs border border-gruvbox-bright-red border-opacity-20">
-                          <div className="text-gruvbox-bright-red">
-                            🚫 No actions remaining. Use bonus rituals or advance to next sprint.
+                      <div className="card-content-area">
+                        <p className="card-text text-gruvbox-dark-fg2 text-sm mb-4 leading-relaxed">
+                          {card.scenario}
+                        </p>
+                        {isOnlyCardLeft && !isCardDisabled && (
+                          <div className="mb-3 p-2 bg-gruvbox-dark-bg2 rounded text-xs text-gruvbox-bright-yellow">
+                            💭 This is your final decision for this sprint. Choose wisely, Agile Shaman.
                           </div>
-                        </div>
-                      )}
-                      <div className="space-y-3">
+                        )}
+                        {isCardDisabled && !isPostponedToEternity && (
+                          <div className="mb-3 p-2 bg-gruvbox-dark-bg2 rounded text-xs border border-gruvbox-bright-red border-opacity-20">
+                            <div className="text-gruvbox-bright-red">
+                              🚫 No actions remaining. Use bonus rituals or advance to next sprint.
+                            </div>
+                          </div>
+                        )}
+                        <div className="space-y-3">
                         {card.choices.map((choice, choiceIndex) => (
                           <button
                             key={choice.id}
                             onClick={() => makeChoice(card, choice)}
                             disabled={isCardDisabled}
-                            className={`w-full text-left p-3 md:p-4 rounded text-sm transition-all duration-200 relative border ${
+                            className={`choice-button w-full text-left p-2 md:p-3 lg:p-4 rounded text-sm transition-all duration-200 relative border ${
                               isCardDisabled
                                 ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed border-gruvbox-dark-fg4 border-opacity-30'
                                 : isOnlyCardLeft
@@ -434,35 +497,31 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                                 : 'bg-gruvbox-dark-bg1 text-gruvbox-dark-fg hover:bg-gruvbox-dark-bg2 border-gruvbox-dark-bg3 hover:border-gruvbox-bright-aqua hover:border-opacity-50 hover:shadow-md hover:z-10'
                             }`}
                           >
-                            <div className="flex items-center gap-2 mb-2">
-                              <span className={`font-bold ${isCardDisabled ? 'text-gruvbox-dark-fg4' : 'text-gruvbox-bright-yellow'}`}>
+                            <div className="flex items-start gap-2 mb-2">
+                              <span className={`font-bold flex-shrink-0 ${isCardDisabled ? 'text-gruvbox-dark-fg4' : 'text-gruvbox-bright-yellow'}`}>
                                 {String.fromCharCode(97 + choiceIndex)})
                               </span>
-                              <span className="font-medium">{choice.label}</span>
+                              <span className="choice-label font-medium">{choice.label}</span>
                             </div>
                             <div className="flex flex-wrap gap-1">
                               {Object.entries(choice.effects).map(([key, value]) => {
-                                const statNames = {
-                                  velocity: 'vel',
-                                  morale: 'team',
-                                  happiness: 'client',
-                                  techDebt: 'debt'
-                                };
-                                const statName = statNames[key as keyof typeof statNames] || key;
+                                const config = STAT_CONFIG[key as keyof typeof STAT_CONFIG];
+                                const statName = config ? config.shortLabel : key;
+                                const colorClass = 'text-white'; // Use white for all card choice effects
                                 // For tech debt, positive is bad (red), negative is good (green)
                                 const isGoodEffect = key === 'techDebt' ? value! < 0 : value! > 0;
                                 const isBadEffect = key === 'techDebt' ? value! > 0 : value! < 0;
                                 return (
                                   <span
                                     key={key}
-                                    className={`text-xs px-2 py-1 rounded font-mono font-semibold ${
-                                      isCardDisabled ? 'bg-gruvbox-dark-bg3 text-gruvbox-dark-fg4 opacity-60' :
-                                      isGoodEffect ? 'bg-gruvbox-light-green text-gruvbox-dark-bg' :
-                                      isBadEffect ? 'bg-gruvbox-light-red text-gruvbox-dark-bg' :
-                                      'bg-gruvbox-dark-bg3 text-gruvbox-dark-fg3'
+                                    className={`text-xs px-1.5 py-0.5 rounded font-mono font-semibold flex-shrink-0 text-white ${
+                                      isCardDisabled ? 'bg-gruvbox-dark-bg3 opacity-60' :
+                                      isGoodEffect ? 'bg-gruvbox-light-green' :
+                                      isBadEffect ? 'bg-gruvbox-light-red' :
+                                      'bg-gruvbox-dark-bg3'
                                     }`}
                                   >
-                                    {value! > 0 ? '+' : ''}{value} {statName}
+                                    {value! > 0 ? '+' : ''}{value} <span className={colorClass}>{statName}</span>
                                   </span>
                                 );
                               })}
@@ -471,7 +530,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                         ))}
                       </div>
                     </div>
-                  );
+                  </div>
+                );
                 })}
               </div>
             </div>
@@ -495,12 +555,12 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                         }
                       </div>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-2 mb-3">
+                      <div className="toolkit-grid mb-3 max-h-48 overflow-y-auto">
                         {/* VELOCITY & PRODUCTIVITY */}
                         <button
                           onClick={() => performRitual('coffee')}
                           disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('coffee')}
-                          className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
+                          className={`toolkit-button rounded font-mono text-xs text-left transition-all duration-200 ${
                             gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('coffee')
                               ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
                               : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
@@ -511,16 +571,16 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                             <span className="font-semibold text-xs">./coffee</span>
                           </div>
                           <div className="text-xs">
-                            <span className="text-gruvbox-bright-blue">+6 vel</span>
+                            {renderMetricEffect(6, 'velocity')}
                             <span className="text-gruvbox-dark-fg4 mx-1">•</span>
-                            <span className="text-gruvbox-bright-green">+4 team</span>
+                            {renderMetricEffect(4, 'morale')}
                     </div>
                   </button>
                   
                   <button
                           onClick={() => performRitual('overtime')}
                           disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('overtime')}
-                          className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
+                          className={`toolkit-button rounded font-mono text-xs text-left transition-all duration-200 ${
                             gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('overtime')
                               ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
                               : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
@@ -531,16 +591,16 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                             <span className="font-semibold text-xs">./overtime</span>
                           </div>
                           <div className="text-xs">
-                            <span className="text-gruvbox-bright-blue">+12 vel</span>
+                            {renderMetricEffect(12, 'velocity')}
                             <span className="text-gruvbox-dark-fg4 mx-1">•</span>
-                            <span className="text-gruvbox-bright-red">-6 team</span>
+                            {renderMetricEffect(-6, 'morale')}
                           </div>
                         </button>
 
                         <button
                           onClick={() => performRitual('intern')}
                           disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('intern')}
-                          className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
+                          className={`toolkit-button rounded font-mono text-xs text-left transition-all duration-200 ${
                             gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('intern')
                               ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
                               : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
@@ -551,18 +611,18 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                             <span className="font-semibold text-xs">./intern</span>
                           </div>
                           <div className="text-xs">
-                            <span className="text-gruvbox-bright-blue">+8 vel</span>
+                            {renderMetricEffect(8, 'velocity')}
                             <span className="text-gruvbox-dark-fg4 mx-1">•</span>
-                            <span className="text-gruvbox-bright-red">+5 debt</span>
+                            {renderMetricEffect(5, 'techDebt')}
                             <span className="text-gruvbox-dark-fg4 mx-1">•</span>
-                            <span className="text-gruvbox-bright-green">+3 team</span>
+                            {renderMetricEffect(3, 'morale')}
                           </div>
                         </button>
 
                         <button
                           onClick={() => performRitual('automation')}
                           disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('automation')}
-                          className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
+                          className={`toolkit-button rounded font-mono text-xs text-left transition-all duration-200 ${
                             gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('automation')
                               ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
                               : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
@@ -573,16 +633,16 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                             <span className="font-semibold text-xs">./automate</span>
                           </div>
                           <div className="text-xs">
-                            <span className="text-gruvbox-bright-red">-12 debt</span>
+                            {renderMetricEffect(-12, 'techDebt')}
                             <span className="text-gruvbox-dark-fg4 mx-1">•</span>
-                            <span className="text-gruvbox-bright-blue">+8 vel</span>
+                            {renderMetricEffect(8, 'velocity')}
                           </div>
                         </button>
 
                         <button
                           onClick={() => performRitual('startup')}
                           disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('startup')}
-                          className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
+                          className={`toolkit-button rounded font-mono text-xs text-left transition-all duration-200 ${
                             gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('startup')
                               ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
                               : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
@@ -593,9 +653,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                             <span className="font-semibold text-xs">./startup</span>
                           </div>
                           <div className="text-xs">
-                            <span className="text-gruvbox-bright-blue">+25 vel</span>
+                            {renderMetricEffect(25, 'velocity')}
                             <span className="text-gruvbox-dark-fg4 mx-1">•</span>
-                            <span className="text-gruvbox-bright-red">-10 team</span>
+                            {renderMetricEffect(-10, 'morale')}
                           </div>
                         </button>
 
@@ -603,7 +663,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                         <button
                           onClick={() => performRitual('pastries')}
                           disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('pastries')}
-                          className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
+                          className={`toolkit-button rounded font-mono text-xs text-left transition-all duration-200 ${
                             gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('pastries')
                               ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
                               : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
@@ -614,14 +674,14 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                             <span className="font-semibold text-xs">./pastries</span>
                           </div>
                           <div className="text-xs">
-                            <span className="text-gruvbox-bright-green">+10 team</span>
+                            {renderMetricEffect(10, 'morale')}
                           </div>
                         </button>
 
                         <button
                           onClick={() => performRitual('pizza')}
                           disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('pizza')}
-                          className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
+                          className={`toolkit-button rounded font-mono text-xs text-left transition-all duration-200 ${
                             gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('pizza')
                               ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
                               : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
@@ -632,18 +692,18 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                             <span className="font-semibold text-xs">./pizza</span>
                       </div>
                           <div className="text-xs">
-                            <span className="text-gruvbox-bright-green">+12 team</span>
+                            {renderMetricEffect(12, 'morale')}
                             <span className="text-gruvbox-dark-fg4 mx-1">•</span>
-                            <span className="text-gruvbox-bright-blue">+4 vel</span>
+                            {renderMetricEffect(4, 'velocity')}
                             <span className="text-gruvbox-dark-fg4 mx-1">•</span>
-                            <span className="text-gruvbox-bright-yellow">+6 client</span>
+                            {renderMetricEffect(6, 'happiness')}
                     </div>
                   </button>
 
                         <button
                           onClick={() => performRitual('inspiration')}
                           disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('inspiration')}
-                          className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
+                          className={`toolkit-button rounded font-mono text-xs text-left transition-all duration-200 ${
                             gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('inspiration')
                               ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
                               : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
@@ -654,18 +714,18 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                             <span className="font-semibold text-xs">./inspire</span>
                           </div>
                           <div className="text-xs">
-                            <span className="text-gruvbox-bright-green">+10 team</span>
+                            {renderMetricEffect(10, 'morale')}
                             <span className="text-gruvbox-dark-fg4 mx-1">•</span>
-                            <span className="text-gruvbox-bright-blue">+6 vel</span>
+                            {renderMetricEffect(6, 'velocity')}
                             <span className="text-gruvbox-dark-fg4 mx-1">•</span>
-                            <span className="text-gruvbox-bright-yellow">+3 client</span>
+                            {renderMetricEffect(3, 'happiness')}
                           </div>
                         </button>
 
                         <button
                           onClick={() => performRitual('mentorship')}
                           disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('mentorship')}
-                          className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
+                          className={`toolkit-button rounded font-mono text-xs text-left transition-all duration-200 ${
                             gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('mentorship')
                               ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
                               : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
@@ -676,9 +736,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                             <span className="font-semibold text-xs">./mentor</span>
                           </div>
                           <div className="text-xs">
-                            <span className="text-gruvbox-bright-green">+12 team</span>
+                            {renderMetricEffect(12, 'morale')}
                             <span className="text-gruvbox-dark-fg4 mx-1">•</span>
-                            <span className="text-gruvbox-bright-red">-6 debt</span>
+                            {renderMetricEffect(-6, 'techDebt')}
                           </div>
                         </button>
 
@@ -686,7 +746,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                   <button
                     onClick={() => performRitual('refactor')}
                           disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('refactor')}
-                          className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
+                          className={`toolkit-button rounded font-mono text-xs text-left transition-all duration-200 ${
                             gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('refactor')
                               ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
                               : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
@@ -697,16 +757,16 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                             <span className="font-semibold text-xs">./refactor</span>
                           </div>
                           <div className="text-xs">
-                            <span className="text-gruvbox-bright-red">-10 debt</span>
+                            {renderMetricEffect(-10, 'techDebt')}
                             <span className="text-gruvbox-dark-fg4 mx-1">•</span>
-                            <span className="text-gruvbox-bright-orange">-3 vel</span>
+                            {renderMetricEffect(-3, 'velocity')}
                           </div>
                         </button>
 
                         <button
                           onClick={() => performRitual('architect')}
                           disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('architect')}
-                          className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
+                          className={`toolkit-button rounded font-mono text-xs text-left transition-all duration-200 ${
                             gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('architect')
                               ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
                               : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
@@ -717,11 +777,11 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                             <span className="font-semibold text-xs">./architect</span>
                           </div>
                           <div className="text-xs">
-                            <span className="text-gruvbox-bright-green">-15 debt</span>
+                            {renderMetricEffect(-15, 'techDebt')}
                             <span className="text-gruvbox-dark-fg4 mx-1">•</span>
-                            <span className="text-gruvbox-bright-red">-5 vel</span>
+                            {renderMetricEffect(-5, 'velocity')}
                             <span className="text-gruvbox-dark-fg4 mx-1">•</span>
-                            <span className="text-gruvbox-bright-red">-3 team</span>
+                            {renderMetricEffect(-3, 'morale')}
                           </div>
                         </button>
 
@@ -729,7 +789,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                         <button
                           onClick={() => performRitual('demo')}
                           disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('demo')}
-                          className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
+                          className={`toolkit-button rounded font-mono text-xs text-left transition-all duration-200 ${
                             gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('demo')
                               ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
                               : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
@@ -740,16 +800,16 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                             <span className="font-semibold text-xs">./demo</span>
                           </div>
                           <div className="text-xs">
-                            <span className="text-gruvbox-bright-yellow">+8 client</span>
+                            {renderMetricEffect(8, 'happiness')}
                             <span className="text-gruvbox-dark-fg4 mx-1">•</span>
-                            <span className="text-gruvbox-bright-orange">-2 vel</span>
+                            {renderMetricEffect(-2, 'velocity')}
                           </div>
                         </button>
 
                         <button
                           onClick={() => performRitual('partnership')}
                           disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('partnership')}
-                          className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
+                          className={`toolkit-button rounded font-mono text-xs text-left transition-all duration-200 ${
                             gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('partnership')
                               ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
                               : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
@@ -760,9 +820,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                             <span className="font-semibold text-xs">./partner</span>
                           </div>
                           <div className="text-xs">
-                            <span className="text-gruvbox-bright-yellow">+15 client</span>
+                            {renderMetricEffect(15, 'happiness')}
                             <span className="text-gruvbox-dark-fg4 mx-1">•</span>
-                            <span className="text-gruvbox-bright-blue">+6 vel</span>
+                            {renderMetricEffect(6, 'velocity')}
                           </div>
                         </button>
 
@@ -770,7 +830,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                         <button
                           onClick={() => performRitual('consultant')}
                           disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('consultant')}
-                          className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
+                          className={`toolkit-button rounded font-mono text-xs text-left transition-all duration-200 ${
                             gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('consultant')
                               ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
                               : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
@@ -781,18 +841,18 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                             <span className="font-semibold text-xs">./consult</span>
                           </div>
                           <div className="text-xs">
-                            <span className="text-gruvbox-bright-blue">+5 vel</span>
+                            {renderMetricEffect(5, 'velocity')}
                             <span className="text-gruvbox-dark-fg4 mx-1">•</span>
-                            <span className="text-gruvbox-bright-yellow">+12 client</span>
+                            {renderMetricEffect(12, 'happiness')}
                             <span className="text-gruvbox-dark-fg4 mx-1">•</span>
-                            <span className="text-gruvbox-bright-green">-8 debt</span>
+                            {renderMetricEffect(-8, 'techDebt')}
                           </div>
                         </button>
 
                         <button
                           onClick={() => performRitual('bonus')}
                           disabled={gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('bonus')}
-                          className={`p-2 rounded font-mono text-xs text-left transition-all duration-200 ${
+                          className={`toolkit-button rounded font-mono text-xs text-left transition-all duration-200 ${
                             gameState.cardActionsCompleted === 0 || gameState.usedRituals.length >= 8 || gameState.usedRituals.includes('bonus')
                               ? 'bg-gruvbox-dark-bg2 text-gruvbox-dark-fg4 cursor-not-allowed opacity-50'
                               : 'button-secondary hover:bg-gruvbox-bright-purple hover:bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30 hover:shadow-lg hover:-translate-y-1'
@@ -803,11 +863,11 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                             <span className="font-semibold text-xs">./bonus</span>
                       </div>
                           <div className="text-xs">
-                            <span className="text-gruvbox-bright-green">+15 team</span>
+                            {renderMetricEffect(15, 'morale')}
                             <span className="text-gruvbox-dark-fg4 mx-1">•</span>
-                            <span className="text-gruvbox-bright-blue">+3 vel</span>
+                            {renderMetricEffect(3, 'velocity')}
                             <span className="text-gruvbox-dark-fg4 mx-1">•</span>
-                            <span className="text-gruvbox-bright-yellow">+5 client</span>
+                            {renderMetricEffect(5, 'happiness')}
                     </div>
                   </button>
                 </div>
@@ -863,20 +923,13 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                       <span className="text-gruvbox-dark-fg4 text-xs">/8</span>
                     </div>
                   </div>
-                  <button
-                    onClick={() => setShowFeedbackModal(true)}
-                    className="text-gruvbox-bright-orange text-xs font-mono hover:text-gruvbox-light-orange transition-all duration-200 cursor-pointer bg-gruvbox-dark-bg2 hover:bg-gruvbox-dark-bg3 px-2 py-1 rounded border border-gruvbox-bright-orange border-opacity-30 hover:border-opacity-60"
-                    title="Submit Feedback"
-                  >
-                    🔨 feedback
-                  </button>
                 </div>
               </div>
             </div>
             </div>
 
           {/* Right Column - Event Journal */}
-          <div className="col-span-1 lg:col-span-3">
+          <div className="col-span-1 lg:col-span-3 flex flex-col min-h-0 overflow-hidden">
             <div className="terminal-card h-full flex flex-col min-h-0 overflow-hidden">
               <div className="flex items-center justify-between p-3 pb-2 border-b border-gruvbox-dark-bg3 flex-shrink-0">
                 <span className="text-gruvbox-bright-yellow text-sm"># agile_journal.log</span>
@@ -890,7 +943,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                 </div>
               </div>
               <div className="flex-1 overflow-hidden p-4 pt-3 min-h-0">
-                <div className="h-full overflow-y-auto" id="journal-container">
+                <div className="scrollable-content h-full" id="journal-container">
                   {gameState.log.length === 0 ? (
                   <div className="text-gruvbox-dark-fg3 text-center py-8 text-sm">
                     <div className="animate-pulse">// Waiting for events...</div>
@@ -922,6 +975,36 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                       ))}
                     </div>
                   )}
+                </div>
+              </div>
+              
+              {/* Journal Footer with Cool Elements */}
+              <div className="flex items-center justify-between p-3 pt-2 border-t border-gruvbox-dark-bg3 flex-shrink-0">
+                {/* Left Side - Cool Element */}
+                <div className="flex items-center gap-2 text-gruvbox-dark-fg3 text-xs">
+                  <span className="animate-pulse">⚡</span>
+                  <span className="font-mono">log_entries: {gameState.log.length}</span>
+                </div>
+                
+                {/* Center - Feedback Button */}
+                <button
+                  onClick={() => setShowFeedbackModal(true)}
+                  className="text-gruvbox-bright-orange text-xs font-mono hover:text-gruvbox-light-orange transition-all duration-200 cursor-pointer bg-gruvbox-dark-bg2 hover:bg-gruvbox-dark-bg3 px-2 py-1 rounded border border-gruvbox-bright-orange border-opacity-30 hover:border-opacity-60"
+                  title="Submit Feedback"
+                >
+                  🔨 feedback
+                </button>
+                
+                {/* Right Side - Cool Element */}
+                <div className="flex items-center gap-2 text-gruvbox-dark-fg3 text-xs">
+                  <span className="font-mono">status:</span>
+                  <span className={`px-1 rounded text-xs ${
+                    gameState.actionsLeft > 0 
+                      ? 'bg-green-400 bg-opacity-20 text-green-400' 
+                      : 'bg-red-400 bg-opacity-20 text-red-400'
+                  }`}>
+                    {gameState.actionsLeft > 0 ? 'active' : 'idle'}
+                  </span>
                 </div>
               </div>
             </div>

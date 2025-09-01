@@ -13,6 +13,120 @@ html, body {
   overflow: hidden;
 }
 
+/* Ensure proper flex behavior for game layout */
+.game-container {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.game-content {
+  flex: 1;
+  min-height: 0;
+  overflow: visible;
+}
+
+/* Grid height distribution */
+.game-content {
+  align-items: stretch;
+}
+
+/* Ensure content is visible */
+.scrollable-content {
+  min-height: 200px;
+}
+
+/* Card visibility */
+.game-card {
+  min-height: 200px;
+}
+
+/* Ensure proper height inheritance */
+.terminal-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.scrollable-content {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Card content containment */
+.terminal-card {
+  overflow: visible;
+  word-wrap: break-word;
+}
+
+/* Game cards specific styling */
+.game-card {
+  max-height: none;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: auto;
+}
+
+/* Card content area - scrollable if needed */
+.game-card .card-content-area {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+}
+
+/* Ensure card content stays within boundaries */
+.card-content {
+  overflow: hidden;
+  word-break: break-word;
+}
+
+/* Prevent text from overflowing card borders */
+.card-text {
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+/* Ensure cards in grid maintain proper sizing */
+.card-grid {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+/* Responsive card sizing */
+@media (max-width: 640px) {
+  .card-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .card-grid {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1rem;
+  }
+}
+
+/* Card container constraints */
+.card-container {
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* Ensure choice buttons don't overflow */
+.choice-button {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.choice-label {
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
 /* Force viewport height for all screen sizes */
 html {
   height: 100dvh !important;
@@ -153,4 +267,113 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-gruvbox-dark-fg4;
+}
+
+/* Responsive toolkit buttons */
+@media (max-width: 768px) {
+  .toolkit-button {
+    @apply p-1;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    min-height: 60px;
+  }
+  
+  .toolkit-grid {
+    @apply grid-cols-2 gap-1;
+  }
+  
+  /* Compact header on mobile */
+  .game-container {
+    @apply p-2;
+  }
+  
+  /* Smaller cards on mobile */
+  .terminal-card {
+    @apply p-2;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .toolkit-button {
+    @apply p-2;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    min-height: 70px;
+  }
+  
+  .toolkit-grid {
+    @apply grid-cols-3 gap-2;
+  }
+}
+
+@media (min-width: 1025px) {
+  .toolkit-button {
+    @apply p-2;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    min-height: 80px;
+  }
+  
+  .toolkit-grid {
+    @apply grid-cols-4 gap-2;
+  }
+}
+
+@media (min-width: 1280px) {
+  .toolkit-grid {
+    @apply grid-cols-5 gap-2;
+  }
+  
+  .toolkit-button {
+    min-height: 85px;
+  }
+}
+
+/* Ensure toolkit buttons are evenly sized */
+.toolkit-button {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  height: 100%;
+}
+
+/* Better spacing for toolkit content */
+.toolkit-button .flex {
+  width: 100%;
+}
+
+.toolkit-button .text-xs {
+  line-height: 1.2;
+}
+
+/* Improve toolkit grid alignment */
+.toolkit-grid {
+  display: grid;
+  align-items: stretch;
+  grid-auto-rows: 1fr;
+}
+
+/* Ensure consistent button heights in grid */
+.toolkit-grid .toolkit-button {
+  min-height: 0;
+  height: auto;
+}
+
+/* Better button content layout */
+.toolkit-button > div:first-child {
+  flex-shrink: 0;
+}
+
+.toolkit-button > div:last-child {
+  flex-shrink: 0;
+  margin-top: auto;
+}
+
+/* Ensure effect tags don't wrap awkwardly */
+.toolkit-button .text-xs {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

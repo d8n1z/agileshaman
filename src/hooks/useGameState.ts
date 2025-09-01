@@ -11,7 +11,7 @@ const createInitialState = (): GameState => ({
   stats: { ...DEFAULT_CONFIG.startingStats },
   sprint: 1,
   maxSprints: DEFAULT_CONFIG.maxSprints,
-  hand: [],
+  hand: drawHand(3, []), // Draw initial hand immediately
   actionsLeft: 2, // 2 actions per sprint
   maxActions: 2,
   ritualsUsed: 0,
@@ -39,6 +39,10 @@ const loadGameState = (): GameState => {
       const parsed = JSON.parse(saved);
       // Validate that the saved state has the required structure
       if (parsed.gameStatus && parsed.stats && parsed.sprint) {
+        // Ensure the saved state has a hand
+        if (!parsed.hand || parsed.hand.length === 0) {
+          parsed.hand = drawHand(3, parsed.playedCards || []);
+        }
         return parsed;
       }
     }
@@ -400,15 +404,16 @@ export const useGameState = () => {
     addLogEntry(message, 'ritual');
   }, [gameState.gameStatus, gameState.cardActionsCompleted, gameState.usedRituals, addLogEntry]);
 
-  // Initialize hand on first load
+  // Initialize hand on first load or when game restarts
   useEffect(() => {
     if (gameState.hand.length === 0 && gameState.gameStatus === 'playing') {
+      const initialHand = drawHand(3, []);
       setGameState(prev => ({
         ...prev,
-        hand: drawHand(3, prev.playedCards) // Pass played cards to avoid duplicates
+        hand: initialHand
       }));
     }
-  }, [gameState.hand.length, gameState.gameStatus, gameState.playedCards]);
+  }, [gameState.gameStatus, gameState.hand.length]); // Run when game status or hand changes
 
   // Save game state to localStorage whenever it changes
   useEffect(() => {
