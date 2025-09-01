@@ -98,24 +98,109 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
     }
 
     if (gameState.gameStatus === 'defeat') {
+      // Check if this was caused by an unplayed card
+      const isUnplayedCardFailure = gameState.defeatReason && 
+        gameState.defeatReason.includes('unplayed') && 
+        gameState.defeatReason.includes('caused catastrophic failure');
+      
       return (
         <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4">
-          <div className="terminal-card p-8 text-center max-w-lg mx-auto shadow-2xl border-2 border-gruvbox-bright-red border-opacity-50">
-            <div className="text-gruvbox-bright-red text-4xl mb-4 font-mono">
-              PROCESS TERMINATED
+          <div className="terminal-card p-6 text-left max-w-2xl mx-auto shadow-2xl border border-gruvbox-bright-red border-opacity-50 font-mono text-sm">
+            {/* Stack Trace Header */}
+            <div className="text-gruvbox-bright-red text-lg mb-3 font-bold">
+              ⚠️  FATAL ERROR - GAME TERMINATED
             </div>
-            <div className="text-gruvbox-bright-orange text-lg mb-2 font-mono">
-              Sprint {gameState.sprint} • Exit Code: FAILURE
+            
+            {/* Stack Trace Body */}
+            <div className="space-y-2 text-gruvbox-dark-fg2">
+              <div className="text-gruvbox-bright-orange">
+                at GameEngine.crash() (sprint:{gameState.sprint})
+              </div>
+              
+              {isUnplayedCardFailure && (
+                <div className="text-red-400 ml-4">
+                  at UnplayedCard.haunt() (unplayed card disaster)
+                </div>
+              )}
+              
+              <div className="text-gruvbox-bright-yellow ml-4">
+                at Metrics.checkGameEnd() (critical threshold exceeded)
+              </div>
+              
+              <div className="text-gruvbox-dark-fg3 ml-8">
+                // {gameState.defeatReason}
+              </div>
             </div>
-            <div className="text-gruvbox-dark-fg2 mb-6 font-mono text-sm bg-gruvbox-dark-bg2 p-3 rounded">
-            {gameState.defeatReason}
+            
+            {/* Critical Metrics Stack */}
+            <div className="mt-4 p-3 bg-gruvbox-dark-bg2 rounded border-l-4 border-red-500">
+              <div className="text-gruvbox-bright-yellow text-sm font-bold mb-2">
+                CRITICAL METRICS STACK:
+              </div>
+              <div className="space-y-1">
+                {Object.entries(STAT_CONFIG).map(([key, config]) => {
+                  const value = gameState.stats[key as keyof typeof gameState.stats];
+                  
+                  // Only show metrics that caused the game end
+                  const isGameEndCause = (key === 'techDebt' && value > 80) || 
+                                       (key !== 'techDebt' && value < 20);
+                  
+                  if (!isGameEndCause) return null;
+                  
+                  // Check if metric hit zero (catastrophic failure)
+                  const isZero = value <= 0;
+                  const isCritical = (key === 'techDebt' && value >= 100) || 
+                                   (key !== 'techDebt' && value <= 0);
+                  
+                  return (
+                    <div 
+                      key={key} 
+                      className={`flex items-center justify-between p-1 rounded ${
+                        isCritical ? 'bg-red-500/20 border border-red-500/40' : 'bg-gruvbox-dark-bg3'
+                      }`}
+                    >
+                      <span className="text-gruvbox-dark-fg2 text-xs">
+                        {config.icon} {config.label}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        {isZero && (
+                          <span className="text-red-400 text-lg animate-pulse" title="CRITICAL: Metric hit zero!">
+                            💀
+                          </span>
+                        )}
+                        {isCritical && !isZero && (
+                          <span className="text-orange-400 text-sm animate-pulse" title="DANGEROUS: Metric at critical level">
+                            ⚠️
+                          </span>
+                        )}
+                        <span className={`font-bold text-xs ${
+                          isZero ? 'text-red-400' : 
+                          isCritical ? 'text-orange-400' : 'text-gruvbox-bright-yellow'
+                        }`}>
+                          {value}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-          <button
-            onClick={restartGame}
-              className="button-primary px-6 py-3 rounded font-mono transition-all"
-          >
-              ./retry-mission
-          </button>
+            
+            {/* Stack Trace Footer */}
+            <div className="mt-4 text-gruvbox-dark-fg3 text-xs">
+              <div>Process terminated with exit code: FAILURE</div>
+              <div>Stack trace generated at: {new Date().toLocaleTimeString()}</div>
+            </div>
+            
+            {/* Action Button */}
+            <div className="mt-4 text-center">
+              <button
+                onClick={restartGame}
+                className="button-primary px-4 py-2 rounded text-sm font-mono transition-all"
+              >
+                ./restart-game
+              </button>
+            </div>
           </div>
         </div>
       );
@@ -139,7 +224,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                 className="text-gruvbox-bright-yellow text-xl font-bold hover:text-gruvbox-light-yellow transition-colors duration-200 cursor-pointer hover:underline"
                 title="Back to Main Menu"
               >
-                ./agile-shaman
+                ../agile-shaman
               </button>
               <span className="text-gruvbox-dark-fg4 text-xs font-mono opacity-60 hover:opacity-100 transition-opacity duration-200">
                 --quit

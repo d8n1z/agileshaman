@@ -2194,32 +2194,23 @@ export const getCardsByRarity = (rarity: 'common' | 'rare' | 'legendary'): Card[
 
 // Function to shuffle and draw a hand
 export const drawHand = (handSize: number = 3, excludeIds: string[] = []): Card[] => {
-  // Weighted card selection for better gameplay balance
+  // Create a clean deck without duplicates, excluding played cards
+  const availableCards = MYSTICAL_DECK.filter(card => !excludeIds.includes(card.id));
   
-  // Weight the draw towards common cards
-  const rarityWeights = { common: 0.7, rare: 0.25, legendary: 0.05 };
-  const weightedDeck: Card[] = [];
-  
-  MYSTICAL_DECK.forEach(card => {
-    const weight = rarityWeights[card.rarity];
-    const count = Math.ceil(weight * 10);
-    for (let i = 0; i < count; i++) {
-      weightedDeck.push(card);
-    }
-  });
-  
-  const shuffledWeighted = weightedDeck.sort(() => Math.random() - 0.5);
-  
-  // Remove duplicates, exclude played cards, and take handSize cards
-  const hand: Card[] = [];
-  const usedIds = new Set<string>(excludeIds); // Start with excluded IDs
-  
-  for (const card of shuffledWeighted) {
-    if (!usedIds.has(card.id) && hand.length < handSize) {
-      hand.push(card);
-      usedIds.add(card.id);
-    }
+  if (availableCards.length === 0) {
+    // If all cards have been played, reset the exclusion list for variety
+    console.log('All cards played, resetting deck for variety');
+    return MYSTICAL_DECK.slice(0, handSize).sort(() => Math.random() - 0.5);
   }
+  
+  // Shuffle available cards and take the requested hand size
+  const shuffled = [...availableCards].sort(() => Math.random() - 0.5);
+  const hand = shuffled.slice(0, handSize);
+  
+  // Debug logging
+  console.log(`Drawing ${handSize} cards:`, hand.map(c => c.id));
+  console.log(`Excluded ${excludeIds.length} cards:`, excludeIds);
+  console.log(`Available cards remaining:`, availableCards.length - handSize);
   
   return hand;
 };

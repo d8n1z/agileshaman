@@ -154,12 +154,89 @@ export const useGameState = () => {
         }
       }
 
-      // Check for game end
-      const gameEnd = checkGameEnd(newStats);
-      const newGameStatus = gameEnd.ended ? 'defeat' : prev.gameStatus;
-
       // Remove card from hand
       const newHand = prev.hand.filter(c => c.id !== card.id);
+      
+      console.log('🎯 After removing card:', {
+        newHandSize: newHand.length,
+        prevActionsLeft: prev.actionsLeft,
+        condition: `prev.actionsLeft === 1 (${prev.actionsLeft === 1}) && newHand.length === 1 (${newHand.length === 1})`
+      });
+      
+      // Check if this was the last action and apply unplayed card consequences
+      let unplayedCardEffects: Partial<GameStats> = {};
+      let unplayedCardLogMessage = '';
+      let unplayedCardDefeatReason = '';
+      
+      // Check if this was the second action (actionsLeft was 1, now becomes 0)
+      if (prev.actionsLeft === 1 && newHand.length === 1) {
+        console.log('🚨 UNPLAYED CARD CONDITION MET!');
+        
+        // This was the second action, so the remaining card is unplayed
+        const unplayedCard = newHand[0];
+        
+        console.log('🚨 UNPLAYED CARD DETECTED:', unplayedCard.title, 'Theme:', unplayedCard.theme);
+        
+        // Apply negative effects based on the unplayed card's theme
+        switch (unplayedCard.theme) {
+          case 'chaos':
+            // Chaos cards left unplayed cause instability
+            unplayedCardEffects = { velocity: -8, morale: -5 };
+            break;
+          case 'mystical':
+            // Mystical cards left unplayed cause confusion
+            unplayedCardEffects = { happiness: -6, techDebt: +8 };
+            break;
+          case 'wisdom':
+            // Wisdom cards left unplayed cause missed opportunities
+            unplayedCardEffects = { velocity: -5, happiness: -4 };
+            break;
+          case 'agile':
+            // Agile cards left unplayed cause process issues
+            unplayedCardEffects = { velocity: -6, morale: -4 };
+            break;
+          default:
+            // Generic negative effects for unplayed cards
+            unplayedCardEffects = { velocity: -4, morale: -3, happiness: -3, techDebt: +5 };
+        }
+        
+        console.log('🚨 Applying unplayed card effects:', unplayedCardEffects);
+        console.log('🚨 Stats before unplayed card effects:', newStats);
+        
+        // Apply the negative effects
+        newStats = applyEffects(newStats, unplayedCardEffects);
+        
+        console.log('🚨 Stats after unplayed card effects:', newStats);
+        
+        // Create the log message for the unplayed card
+        const effectsText = Object.entries(unplayedCardEffects)
+          .filter(([, value]) => value !== 0)
+          .map(([key, value]) => {
+            const statName = key === 'morale' ? 'team_spirit' :
+                            key === 'happiness' ? 'client_sat' :
+                            key === 'techDebt' ? 'tech_debt' : key;
+            return `${value! > 0 ? '+' : ''}${value} ${statName}`;
+          })
+          .join(', ');
+        unplayedCardLogMessage = `🚨 The unplayed "${unplayedCard.title}" card haunts your sprint! ${effectsText}`;
+        
+        // Create a special defeat reason for unplayed card game end
+        unplayedCardDefeatReason = `The unplayed "${unplayedCard.title}" card caused catastrophic failure!`;
+      } else {
+        console.log('🚨 Unplayed card condition NOT met:', {
+          prevActionsLeft: prev.actionsLeft,
+          newHandSize: newHand.length,
+          reason: prev.actionsLeft !== 1 ? 'actionsLeft !== 1' : 'newHand.length !== 1'
+        });
+      }
+
+      // Check for game end AFTER all effects (including unplayed card) are applied
+      const gameEnd = checkGameEnd(newStats);
+      const newGameStatus = gameEnd.ended ? 'defeat' : prev.gameStatus;
+      
+      // If game ended due to unplayed card, use the special reason
+      const finalDefeatReason = (gameEnd.ended && unplayedCardDefeatReason) ? 
+        unplayedCardDefeatReason : gameEnd.reason;
 
       return {
         ...prev,
@@ -169,7 +246,17 @@ export const useGameState = () => {
         cardActionsCompleted: prev.cardActionsCompleted + 1,
         playedCards: [...prev.playedCards, card.id],
         gameStatus: newGameStatus,
-        defeatReason: gameEnd.reason
+        defeatReason: finalDefeatReason,
+        log: unplayedCardLogMessage ? [
+          {
+            id: generateId(),
+            sprint: prev.sprint,
+            timestamp: Date.now(),
+            message: unplayedCardLogMessage,
+            type: 'system' as const
+          },
+          ...prev.log
+        ].slice(0, 100) : prev.log
       };
     });
 
@@ -313,11 +400,35 @@ export const useGameState = () => {
         break;
     }
 
-    setGameState(prev => ({
-      ...prev,
-      stats: applyEffects(prev.stats, effects),
-      usedRituals: [...prev.usedRituals, ritualType]
-    }));
+    setGameState(prev => {
+      const newStats = applyEffects(prev.stats, effects);
+      
+      console.log('🚨 BOOST EFFECTS:', {
+        ritualType,
+        effects,
+        statsBefore: prev.stats,
+        statsAfter: newStats
+      });
+      
+      // Check if this boost caused game end
+      const gameEnd = checkGameEnd(newStats);
+      if (gameEnd.ended) {
+        console.log('🚨 BOOST BACKFIRE DETECTED:', {
+          ritualType,
+          reason: gameEnd.reason,
+          stats: newStats
+        });
+        addLogEntry(`🚨 BOOST BACKFIRE: ${ritualType} boost caused game end! ${gameEnd.reason}`, 'system');
+      }
+      
+      return {
+        ...prev,
+        stats: newStats,
+        gameStatus: gameEnd.ended ? 'defeat' : prev.gameStatus,
+        defeatReason: gameEnd.reason,
+        usedRituals: [...prev.usedRituals, ritualType]
+      };
+    });
 
     addLogEntry(message, 'ritual');
   }, [gameState.gameStatus, gameState.cardActionsCompleted, gameState.usedRituals, addLogEntry]);

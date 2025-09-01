@@ -190,52 +190,50 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartGame, onBrowseC
                 setHasInteracted(true);
                 onStartGame();
               }}
-              whileHover={{ scale: isMobilePreview ? 1 : 1.05, rotateY: isMobilePreview ? 0 : 5 }}
-              whileTap={{ scale: isMobilePreview ? 1 : 0.95 }}
-              initial={{ opacity: 0, x: -50, rotateX: -15 }}
+              whileHover={{ 
+                scale: isMobilePreview ? 1 : 1.02, 
+                y: isMobilePreview ? 0 : -2,
+                boxShadow: isMobilePreview ? "0 4px 6px rgba(0, 0, 0, 0.1)" : "0 8px 20px rgba(250, 189, 47, 0.4)"
+              }}
+              whileTap={{ scale: isMobilePreview ? 1 : 0.98 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{
                 opacity: 1,
-                x: 0,
-                rotateX: 0,
-                y: [0, -3, 0],
-                boxShadow: [
-                  "0 4px 6px rgba(0, 0, 0, 0.1)",
-                  "0 8px 15px rgba(250, 189, 47, 0.3)",
-                  "0 4px 6px rgba(0, 0, 0, 0.1)"
-                ]
+                y: 0
               }}
               transition={{
-                opacity: { delay: 0.2, duration: 0.6, type: "spring", stiffness: 100 },
-                x: { delay: 0.2, duration: 0.6, type: "spring", stiffness: 100 },
-                rotateX: { delay: 0.2, duration: 0.6, type: "spring", stiffness: 100 },
-                y: { delay: 1, duration: 0.8, repeat: Infinity, ease: "easeInOut" },
-                boxShadow: { delay: 1, duration: 0.8, repeat: Infinity, ease: "easeInOut" }
+                opacity: { delay: 0.1, duration: 0.4, ease: "easeOut" },
+                y: { delay: 0.1, duration: 0.4, ease: "easeOut" },
+                scale: { duration: 0.15, ease: "easeOut" },
+                boxShadow: { duration: 0.2, ease: "easeOut" }
               }}
               className="bg-gruvbox-bright-yellow bg-opacity-20 hover:bg-opacity-30 text-gruvbox-bright-yellow border border-gruvbox-bright-yellow border-opacity-50 hover:border-opacity-70 px-8 sm:px-12 py-4 sm:py-5 rounded-lg text-xl sm:text-2xl font-mono transition-all duration-200 w-full sm:w-auto cursor-not-allowed opacity-60"
             >
               <span className="text-gruvbox-bright-green">$</span> ./start
             </motion.button>
 
-                        <motion.button
+            <motion.button
               onClick={() => {
                 if (isMobilePreview) return;
                 setHasInteracted(true);
                 setShowHowToPlay(true);
               }}
-              whileHover={{ scale: isMobilePreview ? 1 : 1.05, rotateY: isMobilePreview ? 0 : -5 }}
-              whileTap={{ scale: isMobilePreview ? 1 : 0.95 }}
-              initial={{ opacity: 0, y: 50, rotateX: 15 }}
+              whileHover={{ 
+                scale: isMobilePreview ? 1 : 1.02, 
+                y: isMobilePreview ? 0 : -2,
+                boxShadow: isMobilePreview ? "0 4px 6px rgba(0, 0, 0, 0.1)" : "0 8px 20px rgba(131, 165, 152, 0.4)"
+              }}
+              whileTap={{ scale: isMobilePreview ? 1 : 0.98 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{
                 opacity: 1,
-                y: 0,
-                rotateX: 0,
-                rotateZ: [0, 1, -1, 0]
+                y: 0
               }}
               transition={{
-                opacity: { delay: 0.3, duration: 0.6, type: "spring", stiffness: 100 },
-                y: { delay: 0.3, duration: 0.6, type: "spring", stiffness: 100 },
-                rotateX: { delay: 0.3, duration: 0.6, type: "spring", stiffness: 100 },
-                rotateZ: { delay: 1.5, duration: 3, repeat: Infinity, ease: "easeInOut" }
+                opacity: { delay: 0.2, duration: 0.4, ease: "easeOut" },
+                y: { delay: 0.2, duration: 0.4, ease: "easeOut" },
+                scale: { duration: 0.15, ease: "easeOut" },
+                boxShadow: { duration: 0.2, ease: "easeOut" }
               }}
               className="bg-gruvbox-bright-blue bg-opacity-20 hover:bg-opacity-30 text-gruvbox-bright-blue border border-gruvbox-bright-blue border-opacity-50 hover:border-opacity-70 px-8 sm:px-12 py-4 sm:py-5 rounded-lg text-xl sm:text-2xl font-mono transition-all duration-200 w-full sm:w-auto cursor-not-allowed opacity-60"
             >
@@ -248,22 +246,22 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartGame, onBrowseC
                 setHasInteracted(true);
                 onBrowseCards();
               }}
-              whileHover={{ scale: isMobilePreview ? 1 : 1.05, rotateY: isMobilePreview ? 0 : 5 }}
-              whileTap={{ scale: isMobilePreview ? 1 : 0.95 }}
-              initial={{ opacity: 0, x: 50, rotateX: -15 }}
+              whileHover={{ 
+                scale: isMobilePreview ? 1 : 1.02, 
+                y: isMobilePreview ? 0 : -2,
+                boxShadow: isMobilePreview ? "0 4px 6px rgba(0, 0, 0, 0.1)" : "0 8px 20px rgba(177, 98, 134, 0.4)"
+              }}
+              whileTap={{ scale: isMobilePreview ? 1 : 0.98 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{
                 opacity: 1,
-                x: 0,
-                rotateX: 0,
-                scale: [1, 1.02, 1],
-                rotateY: [0, 2, -2, 0]
+                y: 0
               }}
               transition={{
-                opacity: { delay: 0.4, duration: 0.6, type: "spring", stiffness: 100 },
-                x: { delay: 0.4, duration: 0.6, type: "spring", stiffness: 100 },
-                rotateX: { delay: 0.4, duration: 0.6, type: "spring", stiffness: 100 },
-                scale: { delay: 2, duration: 4, repeat: Infinity, ease: "easeInOut" },
-                rotateY: { delay: 2, duration: 4, repeat: Infinity, ease: "easeInOut" }
+                opacity: { delay: 0.3, duration: 0.4, ease: "easeOut" },
+                y: { delay: 0.3, duration: 0.4, ease: "easeOut" },
+                scale: { duration: 0.15, ease: "easeOut" },
+                boxShadow: { duration: 0.2, ease: "easeOut" }
               }}
               className="bg-gruvbox-bright-purple bg-opacity-20 hover:bg-opacity-30 text-gruvbox-bright-purple border border-gruvbox-bright-purple border-opacity-50 hover:border-opacity-70 px-8 sm:px-12 py-4 sm:py-5 rounded-lg text-xl sm:text-2xl font-mono transition-all duration-200 w-full sm:w-auto cursor-not-allowed opacity-60"
             >
