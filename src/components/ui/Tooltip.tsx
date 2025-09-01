@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 
 interface TooltipProps {
   children: React.ReactNode;
@@ -36,8 +36,6 @@ export const Tooltip: React.FC<TooltipProps> = ({
   const getTooltipPosition = () => {
     if (!tooltipRef.current || !triggerRef.current) return {};
 
-    const triggerRect = triggerRef.current.getBoundingClientRect();
-    const tooltipRect = tooltipRef.current.getBoundingClientRect();
     const gap = 8;
 
     switch (position) {
@@ -47,8 +45,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
           left: '50%',
           transform: 'translateX(-50%)',
           marginBottom: gap,
-          minWidth: 'max-content',
-          position: 'absolute'
+          minWidth: 'max-content'
         };
       case 'bottom':
         return {
@@ -56,24 +53,21 @@ export const Tooltip: React.FC<TooltipProps> = ({
           left: '50%',
           transform: 'translateX(-50%)',
           marginTop: gap,
-          minWidth: 'max-content',
-          position: 'absolute'
+          minWidth: 'max-content'
         };
       case 'left':
         return {
           right: '100%',
           top: '50%',
           transform: 'translateY(-50%)',
-          marginRight: gap,
-          position: 'absolute'
+          marginRight: gap
         };
       case 'right':
         return {
           left: '100%',
           top: '50%',
           transform: 'translateY(-50%)',
-          marginLeft: gap,
-          position: 'absolute'
+          marginLeft: gap
         };
       default:
         return {};
