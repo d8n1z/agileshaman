@@ -15,17 +15,21 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartGame, onBrowseC
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
 
-  // Generate floating quotes - distributed around center with safe radius
+  // Generate floating quotes with collision detection and optimal distribution
   useEffect(() => {
-    // Use only a subset of quotes to reduce density - much sparser
-    const selectedQuotes = BACKGROUND_QUOTES.filter((_, index) => index % 6 === 0); // Use every 6th quote (~7-8 quotes total)
+    // Use only a subset of quotes to reduce density
+    const selectedQuotes = BACKGROUND_QUOTES.filter((_, index) => index % 6 === 0);
     
-    const quotes = selectedQuotes.map((quote, index) => {
+    const quotes: Array<{id: number, text: string, x: number, y: number, delay: number}> = [];
+    const minDistance = 25; // Minimum distance between quotes (in %)
+    const maxAttempts = 100;
+    
+    selectedQuotes.forEach((quote, index) => {
       let x, y;
       let attempts = 0;
-      const maxAttempts = 50;
+      let positionFound = false;
       
-      // Keep trying until we find a position outside the center safe zone
+      // Try to find a position that doesn't overlap with existing quotes
       do {
         x = Math.random() * 90 + 5; // 5-95% from left
         y = Math.random() * 90 + 5; // 5-95% from top
@@ -35,35 +39,88 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartGame, onBrowseC
           Math.pow(x - 50, 2) + Math.pow(y - 50, 2)
         );
         
-        // Safe radius around center (adjust this value to control exclusion zone)
-        const safeRadius = 35; // Larger radius = more space around center
+        // Enhanced safe zone calculation - keep quotes away from central content
+        const safeRadius = 45; // Increased from 30 to 45 for better content protection
         
+        // Check if position is outside center safe zone
         if (distanceFromCenter > safeRadius) {
-          break; // Position is good, outside safe zone
+          // Additional safety checks for specific content areas
+          const logoArea = { x: 50, y: 35, radius: 20 }; // Logo area
+          const titleArea = { x: 50, y: 45, radius: 25 }; // Title area  
+          const buttonsArea = { x: 50, y: 55, radius: 30 }; // Buttons area
+          const quoteArea = { x: 50, y: 70, radius: 35 }; // Dave Thomas quote area
+          
+          // Check if position is too close to any content area
+          const logoDistance = Math.sqrt(Math.pow(x - logoArea.x, 2) + Math.pow(y - logoArea.y, 2));
+          const titleDistance = Math.sqrt(Math.pow(x - titleArea.x, 2) + Math.pow(y - titleArea.y, 2));
+          const buttonsDistance = Math.sqrt(Math.pow(x - buttonsArea.x, 2) + Math.pow(y - buttonsArea.y, 2));
+          const quoteDistance = Math.sqrt(Math.pow(x - quoteArea.x, 2) + Math.pow(y - quoteArea.y, 2));
+          
+          if (logoDistance < logoArea.radius || 
+              titleDistance < titleArea.radius || 
+              buttonsDistance < buttonsArea.radius || 
+              quoteDistance < quoteArea.radius) {
+            attempts++;
+            continue; // Try another position
+          }
+          
+          // Check collision with existing quotes
+          let collision = false;
+          for (const existingQuote of quotes) {
+            const distance = Math.sqrt(
+              Math.pow(x - existingQuote.x, 2) + Math.pow(y - existingQuote.y, 2)
+            );
+            if (distance < minDistance) {
+              collision = true;
+              break;
+            }
+          }
+          
+          if (!collision) {
+            positionFound = true;
+            break;
+          }
         }
         
         attempts++;
       } while (attempts < maxAttempts);
       
-      // If we couldn't find a good position, place it on the edges
-      if (attempts >= maxAttempts) {
+      // If we couldn't find a collision-free position, use edge placement strategy
+      if (!positionFound) {
         const edge = Math.floor(Math.random() * 4);
         switch(edge) {
-          case 0: x = Math.random() * 15 + 5; break;  // Left edge
-          case 1: x = Math.random() * 15 + 80; break; // Right edge  
-          case 2: y = Math.random() * 15 + 5; break;  // Top edge
-          case 3: y = Math.random() * 15 + 80; break; // Bottom edge
+          case 0: x = Math.random() * 12 + 2; break;   // Left edge
+          case 1: x = Math.random() * 12 + 86; break;  // Right edge  
+          case 2: y = Math.random() * 12 + 2; break;   // Top edge
+          case 3: y = Math.random() * 12 + 86; break;  // Bottom edge
+        }
+        
+        // Try to adjust edge position to avoid collisions
+        for (const existingQuote of quotes) {
+          const distance = Math.sqrt(
+            Math.pow(x - existingQuote.x, 2) + Math.pow(y - existingQuote.y, 2)
+          );
+          if (distance < minDistance) {
+            // Move slightly along the edge
+            if (edge === 0 || edge === 1) { // Left/Right edges
+              y = Math.max(2, Math.min(98, y + (Math.random() > 0.5 ? 15 : -15)));
+            } else { // Top/Bottom edges
+              x = Math.max(2, Math.min(98, x + (Math.random() > 0.5 ? 15 : -15)));
+            }
+            break;
+          }
         }
       }
       
-      return {
+      quotes.push({
         id: index,
         text: quote,
         x,
         y,
-        delay: Math.random() * 15 // 0-15s delay for quicker starts
-      };
+        delay: Math.random() * 12 + 2 // 2-14s delay for better distribution
+      });
     });
+    
     setFloatingQuotes(quotes);
   }, []);
 
@@ -76,7 +133,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartGame, onBrowseC
   );
 
   return (
-    <div className="h-screen bg-gruvbox-dark-bg0 flex flex-col overflow-hidden relative">
+    <div className="min-h-screen bg-gruvbox-dark-bg0 flex flex-col overflow-hidden relative" style={{ height: '100dvh' }}>
       {/* ACTIVE BACKGROUND */}
       {subtleDotBackground}
       
@@ -207,9 +264,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartGame, onBrowseC
                 scale: { duration: 0.15, ease: "easeOut" },
                 boxShadow: { duration: 0.2, ease: "easeOut" }
               }}
-              className="bg-gruvbox-bright-yellow bg-opacity-20 hover:bg-opacity-30 text-gruvbox-bright-yellow border border-gruvbox-bright-yellow border-opacity-50 hover:border-opacity-70 px-8 sm:px-12 py-4 sm:py-5 rounded-lg text-xl sm:text-2xl font-mono transition-all duration-200 w-full sm:w-auto cursor-not-allowed opacity-60"
+              className="bg-gruvbox-bright-yellow bg-opacity-20 hover:bg-opacity-30 text-gruvbox-bright-yellow border border-gruvbox-bright-yellow border-opacity-50 hover:border-opacity-70 px-8 sm:px-12 py-4 sm:py-5 rounded-lg text-xl sm:text-2xl font-mono transition-all duration-200 w-full sm:w-auto cursor-pointer"
             >
-              <span className="text-gruvbox-bright-green">$</span> ./start
+              ./start
             </motion.button>
 
             <motion.button
@@ -235,9 +292,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartGame, onBrowseC
                 scale: { duration: 0.15, ease: "easeOut" },
                 boxShadow: { duration: 0.2, ease: "easeOut" }
               }}
-              className="bg-gruvbox-bright-blue bg-opacity-20 hover:bg-opacity-30 text-gruvbox-bright-blue border border-gruvbox-bright-blue border-opacity-50 hover:border-opacity-70 px-8 sm:px-12 py-4 sm:py-5 rounded-lg text-xl sm:text-2xl font-mono transition-all duration-200 w-full sm:w-auto cursor-not-allowed opacity-60"
+              className="bg-gruvbox-bright-blue bg-opacity-20 hover:bg-opacity-30 text-gruvbox-bright-blue border border-gruvbox-bright-blue border-opacity-50 hover:border-opacity-70 px-8 sm:px-12 py-4 sm:py-5 rounded-lg text-xl sm:text-2xl font-mono transition-all duration-200 w-full sm:w-auto cursor-pointer"
             >
-              <span className="text-gruvbox-bright-green">$</span> ./help
+              ./help
             </motion.button>
 
             <motion.button
@@ -248,7 +305,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartGame, onBrowseC
               }}
               whileHover={{ 
                 scale: isMobilePreview ? 1 : 1.02, 
-                y: isMobilePreview ? 0 : -2,
+                y: isMobilePreview ? 1 : -2,
                 boxShadow: isMobilePreview ? "0 4px 6px rgba(0, 0, 0, 0.1)" : "0 8px 20px rgba(177, 98, 134, 0.4)"
               }}
               whileTap={{ scale: isMobilePreview ? 1 : 0.98 }}
@@ -263,10 +320,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartGame, onBrowseC
                 scale: { duration: 0.15, ease: "easeOut" },
                 boxShadow: { duration: 0.2, ease: "easeOut" }
               }}
-              className="bg-gruvbox-bright-purple bg-opacity-20 hover:bg-opacity-30 text-gruvbox-bright-purple border border-gruvbox-bright-purple border-opacity-50 hover:border-opacity-70 px-8 sm:px-12 py-4 sm:py-5 rounded-lg text-xl sm:text-2xl font-mono transition-all duration-200 w-full sm:w-auto cursor-not-allowed opacity-60"
+              className="bg-gruvbox-bright-purple bg-opacity-20 hover:bg-opacity-30 text-gruvbox-bright-purple border border-gruvbox-bright-purple border-opacity-50 hover:border-opacity-70 px-8 sm:px-12 py-4 sm:py-5 rounded-lg text-xl sm:text-2xl font-mono transition-all duration-200 w-full sm:w-auto cursor-pointer"
             >
-              <span className="text-gruvbox-bright-green">$</span> ./deck
+              ./deck
             </motion.button>
+
+
           </motion.div>
 
 
@@ -288,6 +347,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartGame, onBrowseC
           </div>
         </motion.div>
 
+
+
+
+
         </motion.div>
       </div>
 
@@ -299,7 +362,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartGame, onBrowseC
           transition={{ delay: 0.6 }}
           className="text-gruvbox-dark-fg3 text-xs text-center"
         >
-          <span className="text-gruvbox-bright-purple">v2.0.0</span> • Agile Shaman Collective • Sprint Management Survival Satire
+          <span className="text-gruvbox-bright-purple">v2.1.chaos-resonance-8</span> • Agile Shaman Collective • Sprint Management Survival Satire
         </motion.div>
       </footer>
 
@@ -359,10 +422,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartGame, onBrowseC
                 <p className="text-gruvbox-bright-aqua text-lg mb-2">🎯 Victory Conditions:</p>
                 <p>Survive all 8 sprints while keeping your metrics balanced. Avoid letting any metric drop to zero!</p>
               </div>
+
+
             </div>
           </motion.div>
         </div>
       )}
+
+
+
     </div>
   );
 };

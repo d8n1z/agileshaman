@@ -69,7 +69,7 @@ export const CardBrowser: React.FC<CardBrowserProps> = ({ onBack }) => {
   };
 
   return (
-    <div className="h-screen bg-gruvbox-dark-bg0 flex flex-col overflow-hidden">
+    <div className="min-h-screen bg-gruvbox-dark-bg0 flex flex-col overflow-hidden" style={{ height: '100dvh' }}>
       {/* Header */}
       <div className="terminal-card p-6 flex-shrink-0">
         <div className="flex items-center justify-between mb-6">

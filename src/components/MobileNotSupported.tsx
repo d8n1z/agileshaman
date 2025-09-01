@@ -89,7 +89,7 @@ export const MobileNotSupported: React.FC<MobileNotSupportedProps> = ({ onContin
             className="mt-8 pt-6 border-t border-gruvbox-dark-bg3"
           >
             <div className="text-gruvbox-dark-fg4 text-xs">
-              <span className="text-gruvbox-bright-purple">v2.0.0</span> • Agile Shaman Collective
+              <span className="text-gruvbox-bright-purple">v2.1.0</span> • Agile Shaman Collective
             </div>
           </motion.div>
         </motion.div>

@@ -20,6 +20,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
   const { gameState, numberAnimations, chaosEffect, makeChoice, nextSprint, restartGame, performRitual } = useGameState();
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [showRestartConfirm, setShowRestartConfirm] = useState(false);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
   const [shuffledQuotes, setShuffledQuotes] = useState<typeof PROJECT_QUOTES>([]);
 
@@ -209,7 +210,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
   };
 
   return (
-    <div className="h-screen bg-gruvbox-dark-bg0 p-4 font-mono overflow-hidden">
+    <div className="h-screen bg-gruvbox-dark-bg0 p-4 font-mono overflow-hidden" style={{ height: '100dvh' }}>
       <div className="h-full flex flex-col">
         
         {/* Header - Sprint Info with Metrics in Center */}
@@ -299,11 +300,13 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
           
           {/* Left Column - Background Image Area (Narrower) */}
           <div className="hidden lg:block lg:col-span-2">
-            <div className="h-full w-full rounded relative overflow-hidden border border-gruvbox-dark-bg3 min-h-[600px]">
+            <div className="h-full w-full rounded relative overflow-hidden border border-gruvbox-dark-bg3">
               {/* Background image */}
               <div className="absolute inset-0 bg-center bg-no-repeat bg-cover bg-[url('/shaman-bg.png')]" />
               {/* Subtle dark overlay for readability */}
               <div className="absolute inset-0 bg-gruvbox-dark-bg0/30" />
+              
+
               
               {/* Rotating Satirical Quotes */}
               <div className="absolute bottom-4 left-4 right-4">
@@ -329,10 +332,10 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
           </div>
 
           {/* Center Column - Game Content (Wider) */}
-          <div className="col-span-1 lg:col-span-7 flex flex-col min-w-0">
+          <div className="col-span-1 lg:col-span-7 flex flex-col min-h-0">
             
             {/* Cards Container with integrated labels */}
-            <div className="terminal-card p-4 flex-1 flex flex-col">
+            <div className="terminal-card p-4 flex-1 flex flex-col min-h-0">
               {/* Header inside card container */}
               <div className="flex items-center justify-between mb-4 pb-2 border-b border-gruvbox-dark-bg3">
                 <span className="text-gruvbox-bright-yellow font-semibold"># scenario_cards.active()</span>
@@ -836,28 +839,37 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
 
                 {/* Drawer Header with Boost Counter */}
                 <div className="terminal-card p-3 border-b border-gruvbox-dark-bg3 flex items-center justify-between">
-                  <div className={`text-sm font-mono transition-all duration-300 ${
-                    gameState.ritualsUsed < gameState.maxRituals && gameState.cardActionsCompleted >= 1
-                      ? 'text-gruvbox-bright-purple font-bold'
-                      : 'text-gruvbox-bright-yellow'
-                  }`}>
-                    🚀 # sprint_boost.toolkit()
+                  <div className="flex items-center gap-3">
+                    <div className={`text-sm font-mono transition-all duration-300 ${
+                      gameState.ritualsUsed < gameState.maxRituals && gameState.cardActionsCompleted >= 1
+                        ? 'text-gruvbox-bright-purple font-bold'
+                        : 'text-gruvbox-bright-yellow'
+                    }`}>
+                      🚀 # sprint_boost.toolkit()
+                    </div>
+                    <div className={`px-3 py-1 rounded flex items-center gap-2 transition-all duration-300 ${
+                      gameState.cardActionsCompleted >= 1 && gameState.ritualsUsed < gameState.maxRituals
+                        ? 'bg-gruvbox-bright-purple bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30'
+                        : 'bg-gruvbox-dark-bg2'
+                    }`}>
+                      <span className="text-gruvbox-dark-fg3 text-xs">used: </span>
+                      <span className={`font-bold text-sm transition-all duration-500 transform ${
+                        gameState.cardActionsCompleted >= 1
+                          ? 'text-gruvbox-bright-purple'
+                          : 'text-gruvbox-dark-fg3'
+                      } ${numberAnimations.ritualsAvailable}`}>
+                        {gameState.usedRituals.length}
+                      </span>
+                      <span className="text-gruvbox-dark-fg4 text-xs">/8</span>
+                    </div>
                   </div>
-                  <div className={`px-3 py-1 rounded flex items-center gap-2 transition-all duration-300 ${
-                    gameState.cardActionsCompleted >= 1 && gameState.ritualsUsed < gameState.maxRituals
-                      ? 'bg-gruvbox-bright-purple bg-opacity-20 border border-gruvbox-bright-purple border-opacity-30'
-                      : 'bg-gruvbox-dark-bg2'
-                  }`}>
-                    <span className="text-gruvbox-dark-fg3 text-xs">used: </span>
-                    <span className={`font-bold text-sm transition-all duration-500 transform ${
-                      gameState.cardActionsCompleted >= 1
-                        ? 'text-gruvbox-bright-purple'
-                        : 'text-gruvbox-dark-fg3'
-                    } ${numberAnimations.ritualsAvailable}`}>
-                      {gameState.usedRituals.length}
-                    </span>
-                    <span className="text-gruvbox-dark-fg4 text-xs">/8</span>
-                  </div>
+                  <button
+                    onClick={() => setShowFeedbackModal(true)}
+                    className="text-gruvbox-bright-orange text-xs font-mono hover:text-gruvbox-light-orange transition-all duration-200 cursor-pointer bg-gruvbox-dark-bg2 hover:bg-gruvbox-dark-bg3 px-2 py-1 rounded border border-gruvbox-bright-orange border-opacity-30 hover:border-opacity-60"
+                    title="Submit Feedback"
+                  >
+                    🔨 feedback
+                  </button>
                 </div>
               </div>
             </div>
@@ -865,8 +877,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
 
           {/* Right Column - Event Journal */}
           <div className="col-span-1 lg:col-span-3">
-            <div className="terminal-card h-full flex flex-col overflow-hidden">
-              <div className="flex items-center justify-between p-3 pb-2 border-b border-gruvbox-dark-bg3">
+            <div className="terminal-card h-full flex flex-col min-h-0 overflow-hidden">
+              <div className="flex items-center justify-between p-3 pb-2 border-b border-gruvbox-dark-bg3 flex-shrink-0">
                 <span className="text-gruvbox-bright-yellow text-sm"># agile_journal.log</span>
                 <div className="flex items-center gap-1">
                   <div className={`w-2 h-2 rounded-full animate-pulse ${
@@ -877,7 +889,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                   <span className="text-gruvbox-dark-fg3 text-xs">LIVE</span>
                 </div>
               </div>
-              <div className="flex-1 overflow-hidden p-4 pt-3">
+              <div className="flex-1 overflow-hidden p-4 pt-3 min-h-0">
                 <div className="h-full overflow-y-auto" id="journal-container">
                   {gameState.log.length === 0 ? (
                   <div className="text-gruvbox-dark-fg3 text-center py-8 text-sm">
@@ -977,6 +989,51 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
                   className="bg-gruvbox-dark-bg2 text-gruvbox-dark-fg hover:bg-gruvbox-dark-bg3 px-6 py-3 rounded-lg font-semibold transition-all duration-200"
                 >
                   Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+            {/* Feedback Modal */}
+      {showFeedbackModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+          <div className="bg-gruvbox-dark-bg0 border-2 border-gruvbox-bright-purple p-6 max-w-md mx-4 rounded-lg shadow-2xl">
+            <div className="text-center">
+              <div className="text-gruvbox-bright-purple text-lg font-bold mb-4">
+                🔨 Feedback
+              </div>
+              <div className="bg-gruvbox-dark-bg1 border border-gruvbox-bright-aqua p-3 rounded mb-4">
+                <code className="text-gruvbox-bright-green text-sm font-mono">
+                  agileshaman.dev@gmail.com
+                </code>
+              </div>
+              <div className="flex gap-3 justify-center">
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText('agileshaman.dev@gmail.com');
+                    // Show copy confirmation
+                    const button = event?.target as HTMLButtonElement;
+                    if (button) {
+                      button.innerHTML = 'Copied!';
+                      button.className = 'bg-gruvbox-bright-green text-gruvbox-dark-bg0 px-4 py-2 rounded font-semibold transition-all duration-200';
+                      setTimeout(() => {
+                        button.innerHTML = 'Copy';
+                        button.className = 'bg-gruvbox-bright-aqua hover:bg-gruvbox-light-aqua text-gruvbox-dark-bg0 px-4 py-2 rounded font-semibold transition-all duration-200';
+                      }, 1500);
+                    }
+                  }}
+                  className="bg-gruvbox-bright-aqua hover:bg-gruvbox-light-aqua text-gruvbox-dark-bg0 px-4 py-2 rounded font-semibold transition-all duration-200"
+                  title="Copy to clipboard"
+                >
+                  Copy
+                </button>
+                <button
+                  onClick={() => setShowFeedbackModal(false)}
+                  className="bg-gruvbox-dark-bg2 text-gruvbox-dark-fg hover:bg-gruvbox-dark-bg3 px-4 py-2 rounded font-semibold transition-all duration-200"
+                >
+                  Close
                 </button>
               </div>
             </div>

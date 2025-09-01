@@ -5,10 +5,28 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Ensure proper height handling for all screen sizes */
+html, body {
+  height: 100dvh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Force viewport height for all screen sizes */
+html {
+  height: 100dvh !important;
+}
+
+body {
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+}
+
 /* Minimalistic gruvbox game styles */
 @layer base {
   body {
-    @apply bg-gruvbox-dark-bg0 min-h-screen text-gruvbox-dark-fg font-mono;
+    @apply bg-gruvbox-dark-bg0 text-gruvbox-dark-fg font-mono;
     font-family: 'Source Code Pro', monospace;
   }
   
