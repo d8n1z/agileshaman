@@ -964,7 +964,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
               <div className="flex gap-3 justify-center">
                 <button
                   onClick={() => {
-                    console.log('🔄 RESTART CONFIRMED: Restarting game...');
+                
                     restartGame();
                     setShowRestartConfirm(false);
                   }}

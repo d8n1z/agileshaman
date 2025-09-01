@@ -2199,18 +2199,12 @@ export const drawHand = (handSize: number = 3, excludeIds: string[] = []): Card[
   
   if (availableCards.length === 0) {
     // If all cards have been played, reset the exclusion list for variety
-    console.log('All cards played, resetting deck for variety');
     return MYSTICAL_DECK.slice(0, handSize).sort(() => Math.random() - 0.5);
   }
   
   // Shuffle available cards and take the requested hand size
   const shuffled = [...availableCards].sort(() => Math.random() - 0.5);
   const hand = shuffled.slice(0, handSize);
-  
-  // Debug logging
-  console.log(`Drawing ${handSize} cards:`, hand.map(c => c.id));
-  console.log(`Excluded ${excludeIds.length} cards:`, excludeIds);
-  console.log(`Available cards remaining:`, availableCards.length - handSize);
   
   return hand;
 };
