@@ -22,7 +22,6 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
   const [showRestartConfirm, setShowRestartConfirm] = useState(false);
   const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
   const [shuffledQuotes, setShuffledQuotes] = useState<typeof PROJECT_QUOTES>([]);
-  const [isQuoteHovered, setIsQuoteHovered] = useState(false);
 
   // Shuffle quotes on component mount
   useEffect(() => {
@@ -59,16 +58,16 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
     }
   };
 
-  // Rotate quotes every 4 seconds (pause when hovered)
+  // Rotate quotes every 5 seconds
   useEffect(() => {
-    if (shuffledQuotes.length === 0 || isQuoteHovered) return;
+    if (shuffledQuotes.length === 0) return;
     
     const interval = setInterval(() => {
       setCurrentQuoteIndex((prev) => (prev + 1) % shuffledQuotes.length);
-    }, 4000);
+    }, 5000);
 
     return () => clearInterval(interval);
-  }, [shuffledQuotes, isQuoteHovered]);
+  }, [shuffledQuotes]);
 
   const currentQuote = shuffledQuotes[currentQuoteIndex];
 
@@ -308,32 +307,22 @@ export const GameBoard: React.FC<GameBoardProps> = ({ onBackToMenu }) => {
               
               {/* Rotating Satirical Quotes */}
               <div className="absolute bottom-4 left-4 right-4">
-                <div 
-                  className="bg-gruvbox-dark-bg0/80 backdrop-blur-sm rounded-lg p-3 pb-6 border border-gruvbox-dark-bg3/50 cursor-pointer hover:bg-gruvbox-dark-bg0/90 transition-all duration-300 relative"
-                  onMouseEnter={() => setIsQuoteHovered(true)}
-                  onMouseLeave={() => setIsQuoteHovered(false)}
-                >
-                  {currentQuote && (
+                <div className="bg-gruvbox-dark-bg0/80 backdrop-blur-sm rounded-lg p-3 pb-6 border border-gruvbox-dark-bg3/50 cursor-pointer hover:bg-gruvbox-dark-bg0/90 transition-all duration-300 relative">
+                  {currentQuote ? (
                     <div 
                       key={currentQuoteIndex}
-                      className="text-gruvbox-bright-yellow text-xs font-mono italic text-center leading-relaxed mb-2"
-                      style={{
-                        animation: 'fadeInSlide 0.5s ease-in-out'
-                      }}
+                      className="text-gruvbox-bright-yellow text-sm font-mono italic text-center leading-relaxed mb-2"
                     >
-                      <div>"{currentQuote.quote}"</div>
-                      <div className="text-gruvbox-bright-red mt-1">— {currentQuote.attribution}</div>
-          </div>
-        )}
+                      <div className="mb-2">"{currentQuote.quote}"</div>
+                      <div className="text-gruvbox-bright-red text-xs">— {currentQuote.attribution}</div>
+                    </div>
+                  ) : (
+                    <div className="text-gruvbox-dark-fg3 text-sm font-mono text-center mb-2">
+                      ...
+                    </div>
+                  )}
 
-                  {/* Terminal-style status indicator */}
-                  <div className="absolute bottom-1 left-2 text-xs font-mono">
-                    {isQuoteHovered ? (
-                      <span className="text-gruvbox-bright-aqua opacity-70">[PAUSED]</span>
-                    ) : (
-                      <span className="text-gruvbox-dark-fg3 opacity-40">[LIVE]</span>
-                    )}
-                  </div>
+
                 </div>
               </div>
             </div>

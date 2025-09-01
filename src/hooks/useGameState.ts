@@ -157,12 +157,6 @@ export const useGameState = () => {
       // Remove card from hand
       const newHand = prev.hand.filter(c => c.id !== card.id);
       
-      console.log('🎯 After removing card:', {
-        newHandSize: newHand.length,
-        prevActionsLeft: prev.actionsLeft,
-        condition: `prev.actionsLeft === 1 (${prev.actionsLeft === 1}) && newHand.length === 1 (${newHand.length === 1})`
-      });
-      
       // Check if this was the last action and apply unplayed card consequences
       let unplayedCardEffects: Partial<GameStats> = {};
       let unplayedCardLogMessage = '';
@@ -170,12 +164,8 @@ export const useGameState = () => {
       
       // Check if this was the second action (actionsLeft was 1, now becomes 0)
       if (prev.actionsLeft === 1 && newHand.length === 1) {
-        console.log('🚨 UNPLAYED CARD CONDITION MET!');
-        
         // This was the second action, so the remaining card is unplayed
         const unplayedCard = newHand[0];
-        
-        console.log('🚨 UNPLAYED CARD DETECTED:', unplayedCard.title, 'Theme:', unplayedCard.theme);
         
         // Apply negative effects based on the unplayed card's theme
         switch (unplayedCard.theme) {
@@ -200,13 +190,8 @@ export const useGameState = () => {
             unplayedCardEffects = { velocity: -4, morale: -3, happiness: -3, techDebt: +5 };
         }
         
-        console.log('🚨 Applying unplayed card effects:', unplayedCardEffects);
-        console.log('🚨 Stats before unplayed card effects:', newStats);
-        
         // Apply the negative effects
         newStats = applyEffects(newStats, unplayedCardEffects);
-        
-        console.log('🚨 Stats after unplayed card effects:', newStats);
         
         // Create the log message for the unplayed card
         const effectsText = Object.entries(unplayedCardEffects)
@@ -222,12 +207,6 @@ export const useGameState = () => {
         
         // Create a special defeat reason for unplayed card game end
         unplayedCardDefeatReason = `The unplayed "${unplayedCard.title}" card caused catastrophic failure!`;
-      } else {
-        console.log('🚨 Unplayed card condition NOT met:', {
-          prevActionsLeft: prev.actionsLeft,
-          newHandSize: newHand.length,
-          reason: prev.actionsLeft !== 1 ? 'actionsLeft !== 1' : 'newHand.length !== 1'
-        });
       }
 
       // Check for game end AFTER all effects (including unplayed card) are applied
@@ -403,21 +382,9 @@ export const useGameState = () => {
     setGameState(prev => {
       const newStats = applyEffects(prev.stats, effects);
       
-      console.log('🚨 BOOST EFFECTS:', {
-        ritualType,
-        effects,
-        statsBefore: prev.stats,
-        statsAfter: newStats
-      });
-      
       // Check if this boost caused game end
       const gameEnd = checkGameEnd(newStats);
       if (gameEnd.ended) {
-        console.log('🚨 BOOST BACKFIRE DETECTED:', {
-          ritualType,
-          reason: gameEnd.reason,
-          stats: newStats
-        });
         addLogEntry(`🚨 BOOST BACKFIRE: ${ritualType} boost caused game end! ${gameEnd.reason}`, 'system');
       }
       
@@ -504,7 +471,6 @@ export const useGameState = () => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.ctrlKey && event.shiftKey && event.key === 'R') {
         event.preventDefault();
-        console.log('🔄 RESTART SHORTCUT: Ctrl+Shift+R pressed');
         // Dispatch custom event for component to handle confirmation
         window.dispatchEvent(new CustomEvent('restartGameRequest'));
       }
